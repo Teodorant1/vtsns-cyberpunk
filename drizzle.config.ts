@@ -6,7 +6,7 @@ export default {
   schema: "./src/server/db/schema.ts",
   dialect: "postgresql",
   dbCredentials: {
-    url: env.DATABASE_URL,
+    url: env.NEXT_PRIVATE_DATABASE_URL,
   },
   tablesFilter: ["vtsns-cyberpunk_*"],
 } satisfies Config;
