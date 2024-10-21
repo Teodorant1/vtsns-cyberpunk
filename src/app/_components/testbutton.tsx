@@ -4,8 +4,8 @@ import { api } from "~/trpc/react";
 
 const Testbutton = () => {
   const test_the_button = api.post.test_web_scraper.useMutation({
-    onSuccess: () => {
-      console.log("e");
+    onSuccess: (e) => {
+      console.log(e);
     },
   });
 

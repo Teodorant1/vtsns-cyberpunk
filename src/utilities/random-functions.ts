@@ -1,34 +1,58 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { chromium } from "playwright";
 
-export async function scrapeWebsite() {
+function scrape_vtsns_CRONJOB() {
+  return 0;
+}
+
+export async function scrape_vtsns_article(url: string) {
   // Launch a new Chromium browser
   const browser = await chromium.launch();
   const page = await browser.newPage();
 
   // Navigate to the desired website
-  await page.goto(
-    "https://vtsns.edu.rs/predmeti-info/osnove-dizajna-obavestenje/",
-  );
+  await page.goto(url);
   await page.waitForSelector(".content-block");
 
-  // Extract and log the HTML content of the .content-block element
-  const contentBlockHtml = await page.$eval(".content-block", (element) => {
-    return element.outerHTML; // Get the outer HTML of the selected element
-  });
+  // // Extract and log the HTML content of the .content-block element
+  // const contentBlockHtml = await page.$eval(".content-block", (element) => {
+  //   return element.outerHTML; // Get the outer HTML of the selected element
+  // });
 
-  // Log the extracted HTML content
-  console.log("Scraped HTML:\n", contentBlockHtml);
+  // Extract text from all <p> elements inside the content block
+  const paragraphText = await page.$$eval(".content-block p", (elements) =>
+    elements.map((element) => element.textContent?.trim() ?? ""),
+  );
+
+  // Extract all href values from <a> elements
+  const hrefLinks = await page.$$eval(".content-block a", (elements) =>
+    elements.map((element) => element.getAttribute("href")),
+  );
+
+  // Combine the paragraph text into a single const value (optional)
+  const combinedText = paragraphText.join(" ");
+
+  console.log("Paragraph Text:\n", combinedText);
+  console.log("Links Array:\n", hrefLinks);
 
   // Close the browser
   await browser.close();
+
+  console.log("Paragraph Text:\n", combinedText);
+  console.log("Links Array:\n", hrefLinks);
+  const returnvalue = {
+    combinedText: combinedText,
+    hrefLinks: hrefLinks,
+  };
+
+  return returnvalue; // Return both results
 }
 
 // scrapeWebsite().catch((err) => {
 //   console.error("Error:", err);
 // });
 
-export async function scrapeWebsite_vtsns() {
+export async function scrape_Predmeti_info() {
   // Launch a new browser instance
   const browser = await chromium.launch({ headless: true });
 

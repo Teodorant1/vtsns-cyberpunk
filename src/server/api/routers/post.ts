@@ -7,19 +7,22 @@ import {
 } from "~/server/api/trpc";
 import { posts } from "~/server/db/schema";
 import {
-  scrapeWebsite,
-  scrapeWebsite_vtsns,
+  scrape_vtsns_article,
+  scrape_Predmeti_info,
 } from "~/utilities/random-functions";
 
 export const postRouter = createTRPCRouter({
   test_web_scraper: publicProcedure.mutation(async ({ ctx, input }) => {
-    await scrapeWebsite();
-    // await scrapeWebsite_vtsns();
+    const value1 = await scrape_Predmeti_info();
+    const value2 = await scrape_vtsns_article(
+      "https://vtsns.edu.rs/predmeti-info/prof-petra-balaban-otkazivanje-nastave/",
+    );
 
     // await ctx.db.insert(posts).values({
     //   name: input.name,
     //   createdById: ctx.session.user.id,
     // });
+    return { value1, value2 };
   }),
 
   hello: publicProcedure
