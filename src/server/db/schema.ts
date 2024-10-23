@@ -2,11 +2,13 @@ import { relations, sql } from "drizzle-orm";
 import {
   index,
   integer,
+  jsonb,
   pgTableCreator,
   primaryKey,
   serial,
   text,
   timestamp,
+  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
@@ -18,6 +20,18 @@ import { type AdapterAccount } from "next-auth/adapters";
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
 export const createTable = pgTableCreator((name) => `vtsns-cyberpunk_${name}`);
+
+export const article = createTable("article", {
+  id: uuid("id").primaryKey(),
+  text: text("content").notNull(), // Large text field for the essay content
+  hrefs: jsonb("hrefs").default("[]"), // Using JSONB to store an array of hrefs
+  createdAt: timestamp("created_at", { withTimezone: true })
+    // .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+    () => new Date(),
+  ),
+});
 
 export const posts = createTable(
   "post",
