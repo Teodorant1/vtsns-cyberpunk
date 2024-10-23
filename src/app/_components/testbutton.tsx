@@ -20,7 +20,7 @@ const Testbutton = () => {
         onClick={() => {
           handle_test_the_button();
         }}
-        className="m-5 bg-black p-5 text-white"
+        className="m-5 bg-black p-5 text-white outline outline-white"
       >
         Testbutton
       </button>{" "}

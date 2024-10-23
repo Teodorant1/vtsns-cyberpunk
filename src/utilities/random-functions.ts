@@ -32,8 +32,8 @@ export async function scrape_vtsns_article(url: string) {
   // Combine the paragraph text into a single const value (optional)
   const combinedText = paragraphText.join(" ");
 
-  console.log("Paragraph Text:\n", combinedText);
-  console.log("Links Array:\n", hrefLinks);
+  // console.log("Paragraph Text:\n", combinedText);
+  // console.log("Links Array:\n", hrefLinks);
 
   // Close the browser
   await browser.close();
@@ -51,6 +51,28 @@ export async function scrape_vtsns_article(url: string) {
 // scrapeWebsite().catch((err) => {
 //   console.error("Error:", err);
 // });
+
+function break_title_into_data(input: string) {
+  const slices = input.split(" ");
+  if (slices.includes("-")) {
+    const slices2 = input.split("-");
+
+    const subject_and_action = {
+      subject: slices2[0]?.trim(),
+      action: slices2[1]?.trim(),
+      isSpecial: false,
+    };
+
+    return subject_and_action;
+  } else {
+    const subject_and_action = {
+      subject: input,
+      action: " ",
+      isSpecial: true,
+    };
+    return subject_and_action;
+  }
+}
 
 export async function scrape_Predmeti_info() {
   // Launch a new browser instance

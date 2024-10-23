@@ -3,6 +3,7 @@ import { Search, Menu, ChevronRight, Eye, Clock, ThumbsUp } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Progress } from "~/components/ui/progress";
 import { useState, useEffect } from "react";
+import Testbutton from "./_components/testbutton";
 
 export default function Component() {
   const [progress, setProgress] = useState(13);
@@ -175,6 +176,7 @@ export default function Component() {
             >
               <Search className="h-5 w-5" />
             </Button>
+            <Testbutton />
             <Button
               variant="ghost"
               size="icon"

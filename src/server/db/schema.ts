@@ -23,6 +23,8 @@ export const createTable = pgTableCreator((name) => `vtsns-cyberpunk_${name}`);
 
 export const article = createTable("article", {
   id: uuid("id").primaryKey(),
+  title: varchar("title", { length: 1000 }),
+  href_title: varchar("href_title", { length: 1000 }),
   text: text("content").notNull(), // Large text field for the essay content
   hrefs: jsonb("hrefs").default("[]"), // Using JSONB to store an array of hrefs
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -32,6 +34,14 @@ export const article = createTable("article", {
     () => new Date(),
   ),
 });
+
+// export const articleHref = createTable("article_href", {
+//   id: serial("id").primaryKey(), // Auto-incrementing primary key for hrefs
+//   articleId: uuid("article_id")
+//     .notNull()
+//     .references(() => article.id, { onDelete: "cascade" }), // Foreign key to the article table
+//   href: varchar("href", { length: 1000 }).notNull(), // Store individual hrefs
+// });
 
 export const posts = createTable(
   "post",
