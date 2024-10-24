@@ -4,6 +4,7 @@ import { Button } from "~/components/ui/button";
 import { Progress } from "~/components/ui/progress";
 import { useState, useEffect } from "react";
 import Testbutton from "./_components/testbutton";
+import AudioPlayer from "./_components/audioPlayer";
 
 export default function Component() {
   const [progress, setProgress] = useState(13);
@@ -176,6 +177,7 @@ export default function Component() {
             >
               <Search className="h-5 w-5" />
             </Button>
+            <AudioPlayer />
             {/* <Testbutton /> */}
             <Button
               variant="ghost"
