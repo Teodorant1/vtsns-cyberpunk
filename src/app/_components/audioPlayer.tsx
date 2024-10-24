@@ -16,7 +16,7 @@ const AudioPlayer = () => {
 
   return (
     <div>
-      {/* Hidden audio element */}
+      {/* Hidden audio element and loop*/}
       <audio ref={audioRef} src="/cp2077RP.mp3" loop />
     </div>
   );
