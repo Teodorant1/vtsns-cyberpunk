@@ -25,6 +25,7 @@ import AudioPlayer from "./_components/audioPlayer";
 export default function Component() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [category, setCategory] = useState<string>("all");
+  const [isLoading, setIsLoading] = useState(false);
 
   const categories = ["All", "Tech", "Politics", "Culture", "Science"];
 
@@ -191,22 +192,13 @@ export default function Component() {
 
         .read-article-button {
           position: relative;
-          overflow: hidden;
+          border: none; /* Remove default button border */
+          cursor: pointer; /* Change cursor to pointer */
         }
 
-        .read-article-button::after {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 0;
-          height: 100%;
-          background-color: rgba(255, 255, 255, 0.2);
-          transition: none;
-        }
-
-        .read-article-button:hover::after {
-          animation: loadingBar 1s ease-out;
+        .read-article-button:hover {
+          /* Optional: Add box shadow on hover */
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
       `}</style>
 
@@ -362,10 +354,26 @@ export default function Component() {
                   />
                 </Progress>
               </div>
-              <Button className="read-article-button w-full bg-red-600 text-white hover:bg-red-700">
-                Read Full Article
-                <ChevronRight className="ml-2 h-4 w-4" />
-              </Button>
+              <button
+                className={`read-article-button relative w-full overflow-hidden bg-red-600 py-2 text-white transition-colors duration-300`}
+                onMouseEnter={() => setIsLoading(true)}
+                onMouseLeave={() => setIsLoading(false)}
+              >
+                <span
+                  className={`absolute inset-0 z-10 h-full w-full transition-transform duration-300 ${
+                    isLoading
+                      ? "translate-x-0 transform bg-red-700"
+                      : "-translate-x-full transform"
+                  }`}
+                  style={{
+                    transition: "transform 0.3s ease-in-out",
+                  }}
+                />
+                <span className="relative z-10">
+                  {"Read Full Article"}
+                  {/* <ChevronRight className="ml-2 h-4 w-4" /> */}
+                </span>
+              </button>
             </div>
           ))}
         </div>
