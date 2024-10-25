@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+/* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { chromium } from "playwright";
-
-function scrape_vtsns_CRONJOB() {
-  return 0;
-}
+import { db } from "~/server/db";
+import { article, subject } from "~/server/db/schema";
 
 export async function scrape_vtsns_article(url: string) {
   // Launch a new Chromium browser
@@ -26,7 +27,7 @@ export async function scrape_vtsns_article(url: string) {
 
   // Extract all href values from <a> elements
   const hrefLinks = await page.$$eval(".content-block a", (elements) =>
-    elements.map((element) => element.getAttribute("href")),
+    elements.map((element) => element.getAttribute("href") ?? ""),
   );
 
   // Combine the paragraph text into a single const value (optional)
@@ -54,24 +55,30 @@ export async function scrape_vtsns_article(url: string) {
 
 function break_title_into_data(input: string) {
   const slices = input.split(" ");
+
+  const subject_and_title = {
+    subject: " ",
+    title: input,
+    is_general_announcement: true,
+  };
+
   if (slices.includes("-")) {
     const slices2 = input.split("-");
 
-    const subject_and_action = {
-      subject: slices2[0]?.trim(),
-      action: slices2[1]?.trim(),
-      isSpecial: false,
-    };
-
-    return subject_and_action;
-  } else {
-    const subject_and_action = {
-      subject: input,
-      action: " ",
-      isSpecial: true,
-    };
-    return subject_and_action;
+    subject_and_title.subject = slices2[0]?.trim()!;
+    subject_and_title.title = slices2[1]?.trim()!;
+    subject_and_title.is_general_announcement = false;
   }
+  return subject_and_title;
+
+  // else {
+  //   const subject_and_action = {
+  //     subject: input,
+  //     action: input,
+  //     is_general_announcement: true,
+  //   };
+  //   return subject_and_action;
+  // }
 }
 
 export async function scrape_Predmeti_info() {
@@ -101,7 +108,7 @@ export async function scrape_Predmeti_info() {
 
   // Extract the required data from each post-excerpt directly with Playwright
   const postsData = await page.$$eval(".post-excerpt", (elements) => {
-    return elements.map((element) => {
+    return elements.map(async (element) => {
       // Extract the datetime from the <time> tag
       const timeElement = element.querySelector("time");
       const datetime = timeElement?.getAttribute("datetime") ?? "";
@@ -113,12 +120,19 @@ export async function scrape_Predmeti_info() {
 
       // Convert the datetime string into a JavaScript Date object
       const date = datetime ? new Date(datetime) : null;
+      const href_title_date = title + href + date?.toDateString();
+      const title_analysis = break_title_into_data(title);
+
+      const article = await scrape_vtsns_article(href);
 
       // Return a JSON object with the extracted data
       return {
         date,
         title,
         href,
+        title_analysis,
+        href_title_date,
+        article,
       };
     });
   });
@@ -131,4 +145,69 @@ export async function scrape_Predmeti_info() {
 
   // Return the extracted data
   return postsData;
+}
+
+//we want to grab all of the scraped data from the predmeti-info page , check if they exist, or else just upsert them
+async function scrape_vtsns_CRONJOB() {
+  const article_page = await scrape_Predmeti_info(); // Await the promise
+  for (let i = 0; i < article_page.length; i++) {
+    const article = await article_page[i]; // Await the individual promise if each item is still a promise
+    // const hrefLinks_string = article!.article.hrefLinks.toString();
+    await upsertArticle(
+      article!.title_analysis.title,
+      article!.title_analysis.subject,
+      article!.href_title_date,
+      article!.article.combinedText,
+      article!.article.hrefLinks!,
+    ); // Process each article
+
+    if (article?.title_analysis.is_general_announcement === false) {
+      await upsertSubject(article.title_analysis.subject);
+    }
+  }
+}
+
+// Upsert function for the subject model
+async function upsertSubject(name: string) {
+  await db
+    .insert(subject)
+    .values({
+      name: name,
+    })
+    .onConflictDoUpdate({
+      target: [subject.name], // Define conflict on the unique column
+      set: {
+        name: name,
+      },
+    });
+}
+
+// Upsert function for the article model
+async function upsertArticle(
+  title: string,
+  subject: string,
+  href_title_date: string,
+  text: string,
+  hrefs?: string[],
+) {
+  await db
+    .insert(article)
+    .values({
+      title: title,
+      subject: subject,
+      href_title_date: href_title_date,
+      text: text,
+      hrefs: hrefs ?? [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: [article.href_title_date], // Define conflict on the unique column
+      set: {
+        title: title,
+        text: text,
+        hrefs: hrefs ?? [],
+        updatedAt: new Date(),
+      },
+    });
 }

@@ -1,7 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useRef, useState } from "react";
 
 const AudioPlayer = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [audio_enabled, setaudio_enabled] = useState(false);
 
   //   useEffect(() => {
   //     const audio = audioRef.current;
@@ -23,12 +24,15 @@ const AudioPlayer = () => {
         console.error("Error playing audio: ", error);
       });
     }
+    setaudio_enabled(true);
   }
 
   return (
     <div>
       {/* Hidden audio element and loop*/}
-      <button onClick={playAudio}>Play audio</button>
+      {audio_enabled === false && (
+        <button onClick={playAudio}>Enable audio</button>
+      )}
       <audio ref={audioRef} src="/cp2077RP.mp3" loop />
     </div>
   );

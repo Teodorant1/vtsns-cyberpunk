@@ -21,18 +21,34 @@ import { type AdapterAccount } from "next-auth/adapters";
  */
 export const createTable = pgTableCreator((name) => `vtsns-cyberpunk_${name}`);
 
-export const article = createTable("article", {
-  id: uuid("id").primaryKey(),
-  title: varchar("title", { length: 1000 }),
-  href_title: varchar("href_title", { length: 1000 }),
-  text: text("content").notNull(), // Large text field for the essay content
-  hrefs: jsonb("hrefs").default("[]"), // Using JSONB to store an array of hrefs
-  createdAt: timestamp("created_at", { withTimezone: true })
-    // .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date(),
-  ),
+export const article = createTable(
+  "article",
+  {
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`), // Use default UUID generation
+    title: varchar("title", { length: 1000 }).notNull(),
+    subject: varchar("subject", { length: 1000 }).notNull(),
+    href_title_date: varchar("href_title", { length: 1500 }).notNull(),
+    text: text("content").notNull().notNull(), // Large text field for the essay content
+    hrefs: jsonb("hrefs").default("[]"), // Using JSONB to store an array of hrefs
+    createdAt: timestamp("created_at", { withTimezone: true })
+      // .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+      () => new Date(),
+    ),
+  },
+  (example) => ({
+    href_title_date_idx: index("href_title_date_idx").on(
+      example.href_title_date,
+    ),
+  }),
+);
+
+export const subject = createTable("article_href", {
+  id: serial("id").primaryKey(), // Auto-incrementing primary key for hrefs
+  name: varchar("name", { length: 1000 }).notNull(),
 });
 
 // export const articleHref = createTable("article_href", {

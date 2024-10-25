@@ -1,32 +1,18 @@
 "use client";
-import { useState } from "react";
-import {
-  Search,
-  Menu,
-  ChevronRight,
-  Eye,
-  Clock,
-  ThumbsUp,
-  Calendar,
-} from "lucide-react";
+import { Search, Menu, ChevronRight, Eye, Clock, ThumbsUp } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Progress } from "~/components/ui/progress";
-import { Calendar as CalendarComponent } from "~/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "~/components/ui/popover";
-import { format, isWithinInterval, parseISO } from "date-fns";
-import { type DateRange } from "react-day-picker";
+import { useState, useEffect } from "react";
 import Testbutton from "./_components/testbutton";
 import AudioPlayer from "./_components/audioPlayer";
 
 export default function Component() {
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const [category, setCategory] = useState<string>("all");
+  const [progress, setProgress] = useState(13);
 
-  const categories = ["All", "Tech", "Politics", "Culture", "Science"];
+  useEffect(() => {
+    const timer = setTimeout(() => setProgress(66), 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const articles = [
     {
@@ -34,22 +20,20 @@ export default function Component() {
       excerpt:
         "In a shocking turn of events, artificial intelligence has reached a level of sophistication that surpasses human cognitive abilities...",
       author: "Zoe Nexus",
-      date: "2024-06-15",
+      date: "2077-06-15",
       readTime: 5,
       views: 1500000,
       likes: 95,
-      category: "Tech",
     },
     {
       title: "Cybernetic Implants Now Mandatory for All Citizens",
       excerpt:
         "The government has announced a controversial new policy requiring all citizens to undergo cybernetic enhancement...",
       author: "Rex Voltage",
-      date: "2024-06-14",
+      date: "2077-06-14",
       readTime: 7,
       views: 2000000,
       likes: 88,
-      category: "Politics",
     },
     {
       title: "Virtual Reality Addiction Reaches Epidemic Proportions",
@@ -60,31 +44,18 @@ export default function Component() {
       readTime: 6,
       views: 1800000,
       likes: 92,
-      category: "Culture",
     },
     {
       title: "Megacorporation Wars: The Battle for Neo-Tokyo",
       excerpt:
         "Armed conflicts between rival megacorporations have turned the streets of Neo-Tokyo into a battleground...",
       author: "Blade Runner",
-      date: "2024-06-12",
+      date: "2077-06-12",
       readTime: 8,
       views: 2500000,
       likes: 97,
-      category: "Politics",
     },
   ];
-
-  const filteredArticles = articles.filter(
-    (article) =>
-      (category === "All" || article.category === category) &&
-      (!dateRange?.from ||
-        !dateRange.to ||
-        isWithinInterval(parseISO(article.date), {
-          start: dateRange.from,
-          end: dateRange.to,
-        })),
-  );
 
   return (
     <div className="min-h-screen bg-black text-red-500">
@@ -162,52 +133,6 @@ export default function Component() {
           pointer-events: none;
           animation: scanline 10s linear infinite;
         }
-
-        .button-hover {
-          transition: all 0.3s ease;
-        }
-
-        .button-hover:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 20px rgba(255, 0, 0, 0.5);
-        }
-
-        .calendar-transition {
-          transition: all 0.3s ease;
-        }
-
-        .calendar-transition:hover {
-          background-color: rgba(255, 0, 0, 0.1);
-        }
-
-        @keyframes loadingBar {
-          0% {
-            width: 0;
-          }
-          100% {
-            width: 100%;
-          }
-        }
-
-        .read-article-button {
-          position: relative;
-          overflow: hidden;
-        }
-
-        .read-article-button::after {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 0;
-          height: 100%;
-          background-color: rgba(255, 255, 255, 0.2);
-          transition: none;
-        }
-
-        .read-article-button:hover::after {
-          animation: loadingBar 1s ease-out;
-        }
       `}</style>
 
       <div className="scanline"></div>
@@ -266,65 +191,11 @@ export default function Component() {
       </header>
 
       <main className="container mx-auto py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="glitch text-3xl font-bold text-white">
-            Breaking News
-          </h2>
-        </div>
-
-        <div className="mb-6 flex flex-wrap gap-4">
-          {categories.map((cat) => (
-            <Button
-              key={cat}
-              onClick={() => setCategory(cat)}
-              className={`button-hover ${category === cat ? "bg-red-600" : "bg-gray-800"} text-white hover:bg-red-700`}
-            >
-              {cat}
-              <span className="ml-2 text-xs">Subscribe</span>
-            </Button>
-          ))}
-        </div>
-
-        <div className="mb-6 flex space-x-4">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={"outline"}
-                className={`w-[300px] justify-start border-red-800 bg-gray-900 text-left font-normal text-red-500 ${
-                  !dateRange ? "text-muted-foreground" : ""
-                }`}
-              >
-                <Calendar className="mr-2 h-4 w-4" />
-                {dateRange?.from ? (
-                  dateRange.to ? (
-                    <>
-                      {format(dateRange.from, "LLL dd, y")} -{" "}
-                      {format(dateRange.to, "LLL dd, y")}
-                    </>
-                  ) : (
-                    format(dateRange.from, "LLL dd, y")
-                  )
-                ) : (
-                  <span>Pick a date range</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto border-red-800 bg-gray-900 p-0">
-              <CalendarComponent
-                initialFocus
-                mode="range"
-                defaultMonth={dateRange?.from}
-                selected={dateRange}
-                onSelect={setDateRange}
-                numberOfMonths={2}
-                className="calendar-transition"
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-
+        <h2 className="glitch mb-6 text-3xl font-bold text-white">
+          Breaking News
+        </h2>
         <div className="space-y-6">
-          {filteredArticles.map((article, index) => (
+          {articles.map((article, index) => (
             <div
               key={index}
               className="overflow-hidden rounded-lg border border-red-800 bg-gray-900 p-6 transition-shadow hover:shadow-lg hover:shadow-red-500/20"
@@ -348,10 +219,6 @@ export default function Component() {
                     {article.views.toLocaleString()} views
                   </span>
                 </div>
-                <div className="flex items-center">
-                  <ThumbsUp className="mr-1 h-4 w-4" />
-                  <span className="text-sm">{article.likes}% engagement</span>
-                </div>
               </div>
               <div className="mb-4">
                 <p className="mb-1 text-sm text-red-300">Engagement</p>
@@ -362,7 +229,7 @@ export default function Component() {
                   />
                 </Progress>
               </div>
-              <Button className="read-article-button w-full bg-red-600 text-white hover:bg-red-700">
+              <Button className="w-full bg-red-600 text-white hover:bg-red-700">
                 Read Full Article
                 <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
