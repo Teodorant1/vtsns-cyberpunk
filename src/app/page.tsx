@@ -366,11 +366,11 @@ export default function Component() {
                       : "-translate-x-full transform"
                   }`}
                   style={{
-                    transition: "transform 0.3s ease-in-out",
+                    transition: "transform 1.5s ease-in-out",
                   }}
                 />
                 <span className="relative z-10">
-                  {"Read Full Article"}
+                  {isLoading ? "PENETRATING FIREWALL" : "Read Full Article"}
                   {/* <ChevronRight className="ml-2 h-4 w-4" /> */}
                 </span>
               </button>
