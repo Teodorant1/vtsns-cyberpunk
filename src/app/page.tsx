@@ -366,7 +366,7 @@ export default function Component() {
                       : "-translate-x-full transform"
                   }`}
                   style={{
-                    transition: "transform 1.5s ease-in-out",
+                    transition: "transform 1s ease-in-out",
                   }}
                 />
                 <span className="relative z-10">
