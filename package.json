@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "npm run install:playwright && next build",
+    "build": "npm run installplaywright && next build",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -12,7 +12,7 @@
     "dev": "next dev",
     "lint": "next lint",
     "start": "next start",
-    "install:playwright": "npx playwright install"
+    "installplaywright": "npx playwright install && npx playwright install-deps"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.1.0",
