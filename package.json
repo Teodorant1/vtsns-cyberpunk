@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "npm run installplaywright && next build",
+    "build": "next build && npm run installplaywright",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -33,7 +33,7 @@
     "lucide-react": "^0.453.0",
     "next": "^14.2.4",
     "next-auth": "^4.24.7",
-    "playwright": "^1.48.1",
+    "playwright-core": "^1.27.1",
     "postgres": "^3.4.4",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
