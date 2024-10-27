@@ -74,11 +74,6 @@ export default function Component() {
     setIsLoading_button(string);
   }
 
-  function handle_loading_animation2(boolean: boolean, string: string) {
-    setIsLoading(boolean);
-    setIsLoading_button(string);
-  }
-
   const filteredArticles = articles.filter(
     (article) =>
       (category === "All" || article.category === category) &&
@@ -248,7 +243,7 @@ export default function Component() {
               <Search className="h-5 w-5" />
             </Button>
             <AudioPlayer />
-            {/* <Testbutton /> */}
+            <Testbutton />
             <Button
               variant="ghost"
               size="icon"

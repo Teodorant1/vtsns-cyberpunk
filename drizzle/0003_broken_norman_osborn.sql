@@ -1,1 +1,0 @@
-ALTER TABLE "vtsns-cyberpunk_article" ADD COLUMN "name" varchar(256);

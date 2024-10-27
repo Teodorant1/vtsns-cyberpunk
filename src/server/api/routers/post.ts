@@ -9,20 +9,23 @@ import { posts } from "~/server/db/schema";
 import {
   scrape_vtsns_article,
   scrape_Predmeti_info,
+  scrape_vtsns_CRONJOB,
 } from "~/utilities/random-functions";
 
 export const postRouter = createTRPCRouter({
   test_web_scraper: publicProcedure.mutation(async ({ ctx, input }) => {
-    const value1 = await scrape_Predmeti_info();
-    const value2 = await scrape_vtsns_article(
-      "https://vtsns.edu.rs/predmeti-info/prof-petra-balaban-otkazivanje-nastave/",
-    );
+    const value0 = await scrape_vtsns_CRONJOB();
+    // const value1 = await scrape_Predmeti_info();
+    // const value2 = await scrape_vtsns_article(
+    //   "https://vtsns.edu.rs/predmeti-info/prof-petra-balaban-otkazivanje-nastave/",
+    // );
 
     // await ctx.db.insert(posts).values({
     //   name: input.name,
     //   createdById: ctx.session.user.id,
     // });
-    return { value1, value2 };
+    return value0;
+    // return { value1, value2 };
   }),
 
   hello: publicProcedure

@@ -9,8 +9,24 @@ CREATE TABLE IF NOT EXISTS "vtsns-cyberpunk_account" (
 	"token_type" varchar(255),
 	"scope" varchar(255),
 	"id_token" text,
-	"session_state" varchar(255),
-	CONSTRAINT "vtsns-cyberpunk_account_provider_provider_account_id_pk" PRIMARY KEY("provider","provider_account_id")
+	"session_state" varchar(255)
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "vtsns-cyberpunk_article" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"title" varchar(1000) NOT NULL,
+	"subject" varchar(1000) NOT NULL,
+	"href_title_date" varchar(1500) NOT NULL,
+	"content" text NOT NULL,
+	"hrefs" jsonb DEFAULT '[]',
+	"created_at" timestamp with time zone NOT NULL,
+	"updated_at" timestamp with time zone,
+	"isSpecial_announcement" boolean NOT NULL,
+	CONSTRAINT "vtsns-cyberpunk_article_href_title_date_unique" UNIQUE("href_title_date")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "vtsns-cyberpunk_job_runs" (
+	"runDate" timestamp with time zone PRIMARY KEY NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "vtsns-cyberpunk_post" (
@@ -25,6 +41,12 @@ CREATE TABLE IF NOT EXISTS "vtsns-cyberpunk_session" (
 	"session_token" varchar(255) PRIMARY KEY NOT NULL,
 	"user_id" varchar(255) NOT NULL,
 	"expires" timestamp with time zone NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "vtsns-cyberpunk_article_href" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" varchar(1000) NOT NULL,
+	CONSTRAINT "vtsns-cyberpunk_article_href_name_unique" UNIQUE("name")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "vtsns-cyberpunk_user" (
@@ -59,8 +81,3 @@ DO $$ BEGIN
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
---> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "account_user_id_idx" ON "vtsns-cyberpunk_account" USING btree ("user_id");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "created_by_idx" ON "vtsns-cyberpunk_post" USING btree ("created_by");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "name_idx" ON "vtsns-cyberpunk_post" USING btree ("name");--> statement-breakpoint
-CREATE INDEX IF NOT EXISTS "session_user_id_idx" ON "vtsns-cyberpunk_session" USING btree ("user_id");

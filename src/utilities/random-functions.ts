@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { sql } from "drizzle-orm";
 import { chromium } from "playwright";
+import { type PostData } from "~/project-types";
 import { db } from "~/server/db";
 import { article, jobRuns, subject } from "~/server/db/schema";
 
@@ -40,8 +41,8 @@ export async function scrape_vtsns_article(url: string) {
   // Close the browser
   await browser.close();
 
-  console.log("Paragraph Text:\n", combinedText);
-  console.log("Links Array:\n", hrefLinks);
+  // console.log("Paragraph Text:\n", combinedText);
+  // console.log("Links Array:\n", hrefLinks);
   const returnvalue = {
     combinedText: combinedText,
     hrefLinks: hrefLinks,
@@ -55,21 +56,36 @@ export async function scrape_vtsns_article(url: string) {
 // });
 
 function break_title_into_data(input: string) {
+  console.log("input", input);
   const slices = input.split(" ");
+  console.log("slices", slices);
 
   const subject_and_title = {
     subject: " ",
     title: input,
     is_general_announcement: true,
   };
-
+  console.log("slices.includes(-):", slices.includes("-"));
   if (slices.includes("-")) {
     const slices2 = input.split("-");
 
     subject_and_title.subject = slices2[0]?.trim()!;
     subject_and_title.title = slices2[1]?.trim()!;
     subject_and_title.is_general_announcement = false;
+    return subject_and_title;
   }
+  console.log("v2 slices.includes(–):", slices.includes("–"));
+  if (slices.includes("–")) {
+    const slices2 = input.split("–");
+
+    subject_and_title.subject = slices2[0]?.trim()!;
+    subject_and_title.title = slices2[1]?.trim()!;
+    subject_and_title.is_general_announcement = false;
+    return subject_and_title;
+  }
+
+  console.log("subject_and_title", subject_and_title);
+
   return subject_and_title;
 
   // else {
@@ -83,72 +99,41 @@ function break_title_into_data(input: string) {
 }
 
 export async function scrape_Predmeti_info() {
-  // Launch a new browser instance
   const browser = await chromium.launch({ headless: true });
-
-  // Create a new browser page
   const page = await browser.newPage();
-
-  // Navigate to the target URL
   await page.goto("https://vtsns.edu.rs/predmeti-info/");
-
-  // Wait for the elements with the class "post-excerpt" to load
   await page.waitForSelector(".post-excerpt");
 
-  // // Scrape the HTML content of all elements with class "post-excerpt"
-  // const postExcerptsHtml = await page.$$eval(".post-excerpt", (elements) => {
-  //   // Extract the outerHTML from each element
-  //   return elements.map((element) => element.outerHTML);
-  // });
+  // Extracting data from each post-excerpt element
+  const postElements = await page.$$(".post-excerpt");
+  const postsData: PostData[] = [];
 
-  // // Log all of the scraped HTML content before doing anything else
-  // console.log("Scraped HTML content:");
-  // postExcerptsHtml.forEach((html, index) => {
-  //   console.log(`Post ${index + 1} HTML:\n`, html);
-  // });
+  for (const element of postElements) {
+    const timeElement = await element.$("time");
+    const titleElement = await element.$("h2.entry-title a");
 
-  // Extract the required data from each post-excerpt directly with Playwright
-  const postsData = await page.$$eval(".post-excerpt", async (elements) => {
-    const data = await Promise.all(
-      elements.map(async (element) => {
-        // Extract the datetime from the <time> tag
-        const timeElement = element.querySelector("time");
-        const datetime = timeElement?.getAttribute("datetime") ?? "";
+    const datetime = (await timeElement?.getAttribute("datetime")) ?? "";
+    const title = (await titleElement?.textContent())?.trim() ?? "";
+    const href = (await titleElement?.getAttribute("href")) ?? "";
 
-        // Extract the title and href from the <a> tag inside <h2>
-        const titleElement = element.querySelector("h2.entry-title a");
-        const title = titleElement?.textContent?.trim() ?? "";
-        const href = titleElement?.getAttribute("href") ?? "";
+    const date = datetime ? new Date(datetime) : null;
+    const href_title_date = `${title}${href}${date?.toDateString()}`;
+    const title_analysis = break_title_into_data(title);
+    const article = await scrape_vtsns_article(href);
 
-        // Convert the datetime string into a JavaScript Date object
-        const date = datetime ? new Date(datetime) : null;
-        const href_title_date = title + href + date?.toDateString();
-        const title_analysis = break_title_into_data(title);
+    postsData.push({
+      date,
+      title,
+      href,
+      title_analysis,
+      href_title_date,
+      article,
+    });
+  }
 
-        const article = await scrape_vtsns_article(href);
+  // console.log(postsData);
 
-        // Return a JSON object with the extracted data
-        return {
-          date,
-          title,
-          href,
-          title_analysis,
-          href_title_date,
-          article,
-        };
-      }),
-    );
-
-    return data;
-  });
-
-  // Log the extracted data
-  console.log(postsData);
-
-  // Close the browser instance
   await browser.close();
-
-  // Return the extracted data
   return postsData;
 }
 
@@ -183,14 +168,16 @@ export async function shouldRunJob() {
 export async function scrape_vtsns_CRONJOB() {
   const article_page = await scrape_Predmeti_info(); // Await the promise
   for (let i = 0; i < article_page.length; i++) {
-    // const article = article_page[i]; // Await the individual promise if each item is still a promise
+    // const article = article_page[i]!; // Await the individual promise if each item is still a promise
     // const hrefLinks_string = article!.article.hrefLinks.toString();
     await upsertArticle(
       article_page[i]!.title_analysis.title,
       article_page[i]!.title_analysis.subject,
       article_page[i]!.href_title_date,
       article_page[i]!.article.combinedText,
-      article_page[i]!.article.hrefLinks!,
+      article_page[i]!.title_analysis.is_general_announcement,
+      article_page[i]!.date!,
+      article_page[i]!.article.hrefLinks ?? [],
     ); // Process each article
 
     if (article_page[i]!.title_analysis.is_general_announcement === false) {
@@ -220,6 +207,8 @@ async function upsertArticle(
   subject: string,
   href_title_date: string,
   text: string,
+  isSpecial_announcement: boolean,
+  Date: Date,
   hrefs?: string[],
 ) {
   await db
@@ -230,16 +219,20 @@ async function upsertArticle(
       href_title_date: href_title_date,
       text: text,
       hrefs: hrefs ?? [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: Date,
+      updatedAt: Date,
+      isSpecial_announcement: isSpecial_announcement,
     })
     .onConflictDoUpdate({
       target: [article.href_title_date], // Define conflict on the unique column
       set: {
         title: title,
+        subject: subject,
+        href_title_date: href_title_date,
         text: text,
         hrefs: hrefs ?? [],
-        updatedAt: new Date(),
+        createdAt: Date,
+        isSpecial_announcement: isSpecial_announcement,
       },
     });
 }
