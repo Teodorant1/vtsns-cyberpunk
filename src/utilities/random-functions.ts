@@ -3,81 +3,69 @@
 /* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { sql } from "drizzle-orm";
-import puppeteer from "puppeteer-core";
+import got from "got";
+import { load } from "cheerio"; // Import load function from Cheerio
 import { type PostData } from "~/project-types";
 import { db } from "~/server/db";
 import { article, jobRuns, subject } from "~/server/db/schema";
 
 export async function scrape_Predmeti_info() {
-  const browser = await puppeteer.launch({
-    headless: true,
-    executablePath: "/usr/bin/google-chrome", // Path to Chrome on Vercel
-  });
-  const page = await browser.newPage();
-  await page.goto("https://vtsns.edu.rs/predmeti-info/");
-  await page.waitForSelector(".post-excerpt");
+  // Fetch the page content
+  const { body } = await got("https://vtsns.edu.rs/predmeti-info/");
+  const $ = load(body); // Use load to parse the HTML
 
-  // Extracting data from each post-excerpt element
-  const postElements = await page.$$(".post-excerpt");
   const postsData: PostData[] = [];
 
-  for (const element of postElements) {
-    const timeElement = await element.$("time");
-    const titleElement = await element.$("h2.entry-title a");
+  // Array to hold promises
+  const postPromises: Promise<PostData>[] = [];
 
-    const datetime =
-      (await timeElement?.evaluate((el) => el.getAttribute("datetime"))) ?? "";
-    const title =
-      (await titleElement?.evaluate((el) => el.textContent?.trim())) ?? "";
-    const href =
-      (await titleElement?.evaluate((el) => el.getAttribute("href"))) ?? "";
+  $(".post-excerpt").each((index, element) => {
+    const timeElement = $(element).find("time");
+    const titleElement = $(element).find("h2.entry-title a");
+
+    const datetime = timeElement.attr("datetime") ?? "";
+    const title = titleElement.text().trim() ?? "";
+    const href = titleElement.attr("href") ?? "";
 
     const date = datetime ? new Date(datetime) : null;
     const href_title_date = `${title}${href}${date?.toDateString()}`;
     const title_analysis = break_title_into_data(title);
-    const article = await scrape_vtsns_article(href);
 
-    postsData.push({
-      date,
-      title,
-      href,
-      title_analysis,
-      href_title_date,
-      article,
-    });
-  }
+    // Push the promise to the array
+    postPromises.push(
+      scrape_vtsns_article(href).then((articleData) => ({
+        date,
+        title,
+        href,
+        title_analysis,
+        href_title_date,
+        article: articleData,
+      })),
+    );
+  });
 
-  await browser.close();
-  return postsData;
+  // Await all promises to resolve
+  const postsDataResolved = await Promise.all(postPromises);
+  return postsDataResolved; // Return the resolved data
 }
 
 export async function scrape_vtsns_article(url: string) {
-  // Launch a new puppeteer browser
-  const browser = await puppeteer.launch({
-    headless: true,
-    executablePath: "/usr/bin/google-chrome", // Path to Chrome on Vercel
-  });
-  const page = await browser.newPage();
-
-  // Navigate to the desired website
-  await page.goto(url);
-  await page.waitForSelector(".content-block");
+  // Fetch the article content
+  const { body } = await got(url);
+  const $ = load(body); // Use load to parse the HTML
 
   // Extract text from all <p> elements inside the content block
-  const paragraphText = await page.$$eval(".content-block p", (elements) =>
-    elements.map((element) => element.textContent?.trim() ?? ""),
-  );
+  const paragraphText = $(".content-block p")
+    .map((_, element) => $(element).text().trim())
+    .get();
 
   // Extract all href values from <a> elements
-  const hrefLinks = await page.$$eval(".content-block a", (elements) =>
-    elements.map((element) => element.getAttribute("href") ?? ""),
-  );
+  const hrefLinks = $(".content-block a")
+    .map((_, element) => $(element).attr("href") ?? "")
+    .get();
 
   // Combine the paragraph text into a single const value (optional)
   const combinedText = paragraphText.join(" ");
-
-  // Close the browser
-  await browser.close();
 
   const returnvalue = {
     combinedText: combinedText,

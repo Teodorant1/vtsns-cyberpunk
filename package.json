@@ -4,15 +4,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "next build && npx puppeteer install",
+    "build": "next build",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start",
-    "install:browser": "npx puppeteer install"
+    "start": "next start"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.1.0",
@@ -25,11 +24,14 @@
     "@trpc/client": "^11.0.0-rc.446",
     "@trpc/react-query": "^11.0.0-rc.446",
     "@trpc/server": "^11.0.0-rc.446",
+    "axios": "^1.7.7",
+    "cheerio": "^1.0.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
     "drizzle-orm": "^0.33.0",
     "geist": "^1.3.0",
+    "got": "^14.4.3",
     "lucide-react": "^0.453.0",
     "next": "^14.2.4",
     "next-auth": "^4.24.7",
