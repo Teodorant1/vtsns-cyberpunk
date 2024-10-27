@@ -1,14 +1,6 @@
 "use client";
 import { useState } from "react";
-import {
-  Search,
-  Menu,
-  ChevronRight,
-  Eye,
-  Clock,
-  ThumbsUp,
-  Calendar,
-} from "lucide-react";
+import { Search, Menu, Eye, Clock, ThumbsUp, Calendar } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Progress } from "~/components/ui/progress";
 import { Calendar as CalendarComponent } from "~/components/ui/calendar";
@@ -26,6 +18,7 @@ export default function Component() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [category, setCategory] = useState<string>("all");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoading_button, setIsLoading_button] = useState("");
 
   const categories = ["All", "Tech", "Politics", "Culture", "Science"];
 
@@ -75,6 +68,16 @@ export default function Component() {
       category: "Politics",
     },
   ];
+
+  function handle_loading_animation(boolean: boolean, string: string) {
+    setIsLoading(boolean);
+    setIsLoading_button(string);
+  }
+
+  function handle_loading_animation2(boolean: boolean, string: string) {
+    setIsLoading(boolean);
+    setIsLoading_button(string);
+  }
 
   const filteredArticles = articles.filter(
     (article) =>
@@ -356,12 +359,14 @@ export default function Component() {
               </div>
               <button
                 className={`read-article-button relative w-full overflow-hidden bg-red-600 py-2 text-white transition-colors duration-300`}
-                onMouseEnter={() => setIsLoading(true)}
-                onMouseLeave={() => setIsLoading(false)}
+                onMouseEnter={() =>
+                  handle_loading_animation(true, article.title)
+                }
+                onMouseLeave={() => handle_loading_animation(false, "")}
               >
                 <span
                   className={`absolute inset-0 z-10 h-full w-full transition-transform duration-300 ${
-                    isLoading
+                    isLoading && article.title === isLoading_button
                       ? "translate-x-0 transform bg-red-700"
                       : "-translate-x-full transform"
                   }`}
@@ -370,7 +375,9 @@ export default function Component() {
                   }}
                 />
                 <span className="relative z-10">
-                  {isLoading ? "PENETRATING FIREWALL" : "Read Full Article"}
+                  {isLoading && article.title === isLoading_button
+                    ? "PENETRATING FIREWALL"
+                    : "Read Full Article"}
                   {/* <ChevronRight className="ml-2 h-4 w-4" /> */}
                 </span>
               </button>

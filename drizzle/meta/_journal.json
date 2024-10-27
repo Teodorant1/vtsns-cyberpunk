@@ -43,6 +43,20 @@
       "when": 1729629497321,
       "tag": "0005_minor_legion",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1730040322131,
+      "tag": "0006_renamed_jobrun_to_jobruns",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1730040357303,
+      "tag": "0007_renamed_jobrun_to_jobrunsv2",
+      "breakpoints": true
     }
   ]
 }

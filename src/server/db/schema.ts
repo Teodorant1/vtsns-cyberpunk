@@ -21,6 +21,10 @@ import { type AdapterAccount } from "next-auth/adapters";
  */
 export const createTable = pgTableCreator((name) => `vtsns-cyberpunk_${name}`);
 
+export const jobRuns = createTable("job_runs", {
+  runDate: timestamp("runDate", { withTimezone: true }).primaryKey().notNull(),
+});
+
 export const article = createTable(
   "article",
   {

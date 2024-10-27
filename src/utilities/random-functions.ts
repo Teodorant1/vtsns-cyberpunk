@@ -2,9 +2,10 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 /* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { sql } from "drizzle-orm";
 import { chromium } from "playwright";
 import { db } from "~/server/db";
-import { article, subject } from "~/server/db/schema";
+import { article, jobRuns, subject } from "~/server/db/schema";
 
 export async function scrape_vtsns_article(url: string) {
   // Launch a new Chromium browser
@@ -107,34 +108,38 @@ export async function scrape_Predmeti_info() {
   // });
 
   // Extract the required data from each post-excerpt directly with Playwright
-  const postsData = await page.$$eval(".post-excerpt", (elements) => {
-    return elements.map(async (element) => {
-      // Extract the datetime from the <time> tag
-      const timeElement = element.querySelector("time");
-      const datetime = timeElement?.getAttribute("datetime") ?? "";
+  const postsData = await page.$$eval(".post-excerpt", async (elements) => {
+    const data = await Promise.all(
+      elements.map(async (element) => {
+        // Extract the datetime from the <time> tag
+        const timeElement = element.querySelector("time");
+        const datetime = timeElement?.getAttribute("datetime") ?? "";
 
-      // Extract the title and href from the <a> tag inside <h2>
-      const titleElement = element.querySelector("h2.entry-title a");
-      const title = titleElement?.textContent?.trim() ?? "";
-      const href = titleElement?.getAttribute("href") ?? "";
+        // Extract the title and href from the <a> tag inside <h2>
+        const titleElement = element.querySelector("h2.entry-title a");
+        const title = titleElement?.textContent?.trim() ?? "";
+        const href = titleElement?.getAttribute("href") ?? "";
 
-      // Convert the datetime string into a JavaScript Date object
-      const date = datetime ? new Date(datetime) : null;
-      const href_title_date = title + href + date?.toDateString();
-      const title_analysis = break_title_into_data(title);
+        // Convert the datetime string into a JavaScript Date object
+        const date = datetime ? new Date(datetime) : null;
+        const href_title_date = title + href + date?.toDateString();
+        const title_analysis = break_title_into_data(title);
 
-      const article = await scrape_vtsns_article(href);
+        const article = await scrape_vtsns_article(href);
 
-      // Return a JSON object with the extracted data
-      return {
-        date,
-        title,
-        href,
-        title_analysis,
-        href_title_date,
-        article,
-      };
-    });
+        // Return a JSON object with the extracted data
+        return {
+          date,
+          title,
+          href,
+          title_analysis,
+          href_title_date,
+          article,
+        };
+      }),
+    );
+
+    return data;
   });
 
   // Log the extracted data
@@ -147,22 +152,43 @@ export async function scrape_Predmeti_info() {
   return postsData;
 }
 
+export async function shouldRunJob() {
+  // Fetch the latest date from the `job_run` table
+  const [latestRun] = await db
+    .select({ runDate: jobRuns.runDate })
+    .from(jobRuns)
+    .orderBy(sql`${jobRuns.runDate} DESC`) // Use sql template to order by DESC
+    .limit(1);
+
+  // If no date exists, it's the first run, so return true
+  if (!latestRun) return true;
+
+  // Calculate the time difference in hours
+  const currentTime = new Date();
+  const lastRunTime = new Date(latestRun.runDate);
+  const hoursDifference =
+    (currentTime.getTime() - lastRunTime.getTime()) / (1000 * 60 * 60);
+
+  // Return true if at least 1 hours have passed since the last run
+  return hoursDifference >= 1;
+}
+
 //we want to grab all of the scraped data from the predmeti-info page , check if they exist, or else just upsert them
-async function scrape_vtsns_CRONJOB() {
+export async function scrape_vtsns_CRONJOB() {
   const article_page = await scrape_Predmeti_info(); // Await the promise
   for (let i = 0; i < article_page.length; i++) {
-    const article = await article_page[i]; // Await the individual promise if each item is still a promise
+    // const article = article_page[i]; // Await the individual promise if each item is still a promise
     // const hrefLinks_string = article!.article.hrefLinks.toString();
     await upsertArticle(
-      article!.title_analysis.title,
-      article!.title_analysis.subject,
-      article!.href_title_date,
-      article!.article.combinedText,
-      article!.article.hrefLinks!,
+      article_page[i]!.title_analysis.title,
+      article_page[i]!.title_analysis.subject,
+      article_page[i]!.href_title_date,
+      article_page[i]!.article.combinedText,
+      article_page[i]!.article.hrefLinks!,
     ); // Process each article
 
-    if (article?.title_analysis.is_general_announcement === false) {
-      await upsertSubject(article.title_analysis.subject);
+    if (article_page[i]!.title_analysis.is_general_announcement === false) {
+      await upsertSubject(article_page[i]!.title_analysis.subject);
     }
   }
 }
