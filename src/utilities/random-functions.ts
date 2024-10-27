@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { sql } from "drizzle-orm";
-import puppeteer from "puppeteer"; // Import Puppeteer
+import puppeteer from "puppeteer-core";
 import { type PostData } from "~/project-types";
 import { db } from "~/server/db";
 import { article, jobRuns, subject } from "~/server/db/schema";
