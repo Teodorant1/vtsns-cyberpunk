@@ -1,5 +1,7 @@
 // app/api/data/route.ts
 import { NextResponse } from "next/server";
+import { db } from "~/server/db";
+import { jobRuns } from "~/server/db/schema";
 import {
   shouldRunJob,
   scrape_vtsns_CRONJOB,
@@ -15,10 +17,21 @@ export async function POST(request: Request) {
     const should_run_cron = await shouldRunJob();
     if (should_run_cron === true) {
       await scrape_vtsns_CRONJOB();
+      const currentTime = new Date();
+      await db.insert(jobRuns).values({
+        runDate: currentTime, // Set runDate to the current time
+      });
+      return NextResponse.json({ received: true, status: 200, Skipped: false });
     }
     // Process the data (e.g., save it to a database or perform other operations)
+
     // Respond with a success message and the received data
-    return NextResponse.json({ received: true, status: 200 });
+
+    return NextResponse.json({
+      received: true,
+      status: 200,
+      Skipped: true,
+    });
   } catch (error) {
     // Handle any errors and return an error response
     return NextResponse.json(
