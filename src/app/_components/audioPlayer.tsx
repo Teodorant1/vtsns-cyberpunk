@@ -33,7 +33,7 @@ const AudioPlayer = () => {
       {audio_enabled === false && (
         <button onClick={playAudio}>Enable audio</button>
       )}
-      <audio ref={audioRef} src="/cp2077RP.mp3" loop />
+      <audio ref={audioRef} src="/cybermusic.mp3" loop />
     </div>
   );
 };
