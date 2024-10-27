@@ -54,7 +54,7 @@ export const article = createTable(
   // }),
 );
 
-export const subject = createTable("article_href", {
+export const subject = createTable("subject", {
   id: serial("id").primaryKey(), // Auto-incrementing primary key for hrefs
   name: varchar("name", { length: 1000 }).notNull().unique(),
 });

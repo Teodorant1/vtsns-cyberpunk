@@ -3,24 +3,59 @@
 /* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { sql } from "drizzle-orm";
-import { chromium } from "playwright";
+import puppeteer from "puppeteer"; // Import Puppeteer
 import { type PostData } from "~/project-types";
 import { db } from "~/server/db";
 import { article, jobRuns, subject } from "~/server/db/schema";
 
+export async function scrape_Predmeti_info() {
+  const browser = await puppeteer.launch({ headless: true });
+  const page = await browser.newPage();
+  await page.goto("https://vtsns.edu.rs/predmeti-info/");
+  await page.waitForSelector(".post-excerpt");
+
+  // Extracting data from each post-excerpt element
+  const postElements = await page.$$(".post-excerpt");
+  const postsData: PostData[] = [];
+
+  for (const element of postElements) {
+    const timeElement = await element.$("time");
+    const titleElement = await element.$("h2.entry-title a");
+
+    const datetime =
+      (await timeElement?.evaluate((el) => el.getAttribute("datetime"))) ?? "";
+    const title =
+      (await titleElement?.evaluate((el) => el.textContent?.trim())) ?? "";
+    const href =
+      (await titleElement?.evaluate((el) => el.getAttribute("href"))) ?? "";
+
+    const date = datetime ? new Date(datetime) : null;
+    const href_title_date = `${title}${href}${date?.toDateString()}`;
+    const title_analysis = break_title_into_data(title);
+    const article = await scrape_vtsns_article(href);
+
+    postsData.push({
+      date,
+      title,
+      href,
+      title_analysis,
+      href_title_date,
+      article,
+    });
+  }
+
+  await browser.close();
+  return postsData;
+}
+
 export async function scrape_vtsns_article(url: string) {
   // Launch a new Chromium browser
-  const browser = await chromium.launch();
+  const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
   // Navigate to the desired website
   await page.goto(url);
   await page.waitForSelector(".content-block");
-
-  // // Extract and log the HTML content of the .content-block element
-  // const contentBlockHtml = await page.$eval(".content-block", (element) => {
-  //   return element.outerHTML; // Get the outer HTML of the selected element
-  // });
 
   // Extract text from all <p> elements inside the content block
   const paragraphText = await page.$$eval(".content-block p", (elements) =>
@@ -35,14 +70,9 @@ export async function scrape_vtsns_article(url: string) {
   // Combine the paragraph text into a single const value (optional)
   const combinedText = paragraphText.join(" ");
 
-  // console.log("Paragraph Text:\n", combinedText);
-  // console.log("Links Array:\n", hrefLinks);
-
   // Close the browser
   await browser.close();
 
-  // console.log("Paragraph Text:\n", combinedText);
-  // console.log("Links Array:\n", hrefLinks);
   const returnvalue = {
     combinedText: combinedText,
     hrefLinks: hrefLinks,
@@ -96,45 +126,6 @@ function break_title_into_data(input: string) {
   //   };
   //   return subject_and_action;
   // }
-}
-
-export async function scrape_Predmeti_info() {
-  const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage();
-  await page.goto("https://vtsns.edu.rs/predmeti-info/");
-  await page.waitForSelector(".post-excerpt");
-
-  // Extracting data from each post-excerpt element
-  const postElements = await page.$$(".post-excerpt");
-  const postsData: PostData[] = [];
-
-  for (const element of postElements) {
-    const timeElement = await element.$("time");
-    const titleElement = await element.$("h2.entry-title a");
-
-    const datetime = (await timeElement?.getAttribute("datetime")) ?? "";
-    const title = (await titleElement?.textContent())?.trim() ?? "";
-    const href = (await titleElement?.getAttribute("href")) ?? "";
-
-    const date = datetime ? new Date(datetime) : null;
-    const href_title_date = `${title}${href}${date?.toDateString()}`;
-    const title_analysis = break_title_into_data(title);
-    const article = await scrape_vtsns_article(href);
-
-    postsData.push({
-      date,
-      title,
-      href,
-      title_analysis,
-      href_title_date,
-      article,
-    });
-  }
-
-  // console.log(postsData);
-
-  await browser.close();
-  return postsData;
 }
 
 export async function shouldRunJob() {
