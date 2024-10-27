@@ -9,7 +9,10 @@ import { db } from "~/server/db";
 import { article, jobRuns, subject } from "~/server/db/schema";
 
 export async function scrape_Predmeti_info() {
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({
+    headless: true,
+    executablePath: "/usr/bin/google-chrome", // Path to Chrome on Vercel
+  });
   const page = await browser.newPage();
   await page.goto("https://vtsns.edu.rs/predmeti-info/");
   await page.waitForSelector(".post-excerpt");
@@ -49,8 +52,11 @@ export async function scrape_Predmeti_info() {
 }
 
 export async function scrape_vtsns_article(url: string) {
-  // Launch a new Chromium browser
-  const browser = await puppeteer.launch();
+  // Launch a new puppeteer browser
+  const browser = await puppeteer.launch({
+    headless: true,
+    executablePath: "/usr/bin/google-chrome", // Path to Chrome on Vercel
+  });
   const page = await browser.newPage();
 
   // Navigate to the desired website
