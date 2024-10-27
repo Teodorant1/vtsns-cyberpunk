@@ -161,10 +161,16 @@ export async function shouldRunJob() {
     .limit(1);
 
   // If no date exists, it's the first run, so return true
-  if (!latestRun) return true;
+  if (!latestRun) {
+    return true;
+  }
+
+  console.log("latestRun", latestRun);
 
   // Calculate the time difference in hours
   const currentTime = new Date();
+  console.log("currentTime", currentTime);
+
   const lastRunTime = new Date(latestRun.runDate);
   const hoursDifference =
     (currentTime.getTime() - lastRunTime.getTime()) / (1000 * 60 * 60);
