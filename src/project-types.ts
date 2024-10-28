@@ -25,3 +25,14 @@ export interface PostData {
     hrefLinks: string[];
   }; // Define this based on scrape_vtsns_article function's return type
 }
+
+export interface Category {
+  id: number;
+  name: string;
+}
+
+export interface PaginatedListProps {
+  categories: Category[];
+  currentCategory: string;
+  onToggleCategory: (category: string) => void;
+}

@@ -149,7 +149,7 @@ export async function shouldRunJob() {
 
   // Return true if at least 1 hours have passed since the last run
   // return hoursDifference >= 1;
-  return minutesDifference >= 25;
+  return minutesDifference >= 50;
 }
 
 //we want to grab all of the scraped data from the predmeti-info page , check if they exist, or else just upsert them

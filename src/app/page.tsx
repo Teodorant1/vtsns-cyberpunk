@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Search, Menu, Clock, Calendar } from "lucide-react";
+import { Clock, Calendar } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Calendar as CalendarComponent } from "~/components/ui/calendar";
 import {
@@ -10,6 +10,7 @@ import {
 } from "~/components/ui/popover";
 import { addDays, format, isWithinInterval, parseISO, subDays } from "date-fns";
 import { type DateRange } from "react-day-picker";
+import PaginatedList from "./_components/PaginatedList";
 // import Testbutton from "./_components/testbutton";
 // import AudioPlayer from "./_components/audioPlayer";
 import { api } from "~/trpc/react";
@@ -18,7 +19,7 @@ import { api } from "~/trpc/react";
 export default function Component() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: subDays(new Date(), 7),
-    to: addDays(new Date(), 1),
+    to: addDays(new Date(), 3),
   });
   // const [category, setCategory] = useState<string>("all");
   const [isLoading, setIsLoading] = useState(false);
@@ -59,244 +60,29 @@ export default function Component() {
     return newarticles;
   }
 
-  function PaginatedList() {
-    const [currentPage, setCurrentPage] = useState<number>(0);
-    const itemsPerPage = 10;
-
-    const startIdx = currentPage * itemsPerPage;
-    const endIdx = startIdx + itemsPerPage;
-    const currentItems = categories.data!.slice(startIdx, endIdx);
-
-    const handleNext = () => {
-      if (endIdx < categories.data!.length) {
-        setCurrentPage((prev) => prev + 1);
-      }
-    };
-
-    const handlePrevious = () => {
-      if (startIdx > 0) {
-        setCurrentPage((prev) => prev - 1);
-      }
-    };
-
-    return (
-      <div className="mb-6 flex flex-wrap gap-3">
-        <div>
-          {" "}
-          <div>
-            <div>
-              Total Available Subjects: {categories.data!.length} , Current
-              Page: {currentPage + 1}{" "}
-            </div>
-            <button
-              className="m-5"
-              onClick={handlePrevious}
-              disabled={currentPage === 0}
-            >
-              Previous
-            </button>
-            <button
-              className="m-5"
-              onClick={handleNext}
-              disabled={endIdx >= categories.data!.length}
-            >
-              Next
-            </button>
-          </div>
-          {currentItems.map((cat, index) => (
-            <Button
-              key={cat.id}
-              onClick={() => ToggleCategory(cat.name)}
-              className={`button-hover mx-5 my-2 ${currentcategory === cat.name ? "bg-red-600" : "bg-gray-800"} text-white hover:bg-red-700`}
-            >
-              {cat.name}
-              {/* <span className="ml-2 text-xs">Subscribe</span> */}
-            </Button>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-black text-red-500">
-      <style jsx>{`
-        @keyframes glitch {
-          0% {
-            text-shadow:
-              0.05em 0 0 rgba(255, 0, 0, 0.75),
-              -0.05em -0.025em 0 rgba(0, 255, 0, 0.75),
-              -0.025em 0.05em 0 rgba(0, 0, 255, 0.75);
-          }
-          14% {
-            text-shadow:
-              0.05em 0 0 rgba(255, 0, 0, 0.75),
-              -0.05em -0.025em 0 rgba(0, 255, 0, 0.75),
-              -0.025em 0.05em 0 rgba(0, 0, 255, 0.75);
-          }
-          15% {
-            text-shadow:
-              -0.05em -0.025em 0 rgba(255, 0, 0, 0.75),
-              0.025em 0.025em 0 rgba(0, 255, 0, 0.75),
-              -0.05em -0.05em 0 rgba(0, 0, 255, 0.75);
-          }
-          49% {
-            text-shadow:
-              -0.05em -0.025em 0 rgba(255, 0, 0, 0.75),
-              0.025em 0.025em 0 rgba(0, 255, 0, 0.75),
-              -0.05em -0.05em 0 rgba(0, 0, 255, 0.75);
-          }
-          50% {
-            text-shadow:
-              0.025em 0.05em 0 rgba(255, 0, 0, 0.75),
-              0.05em 0 0 rgba(0, 255, 0, 0.75),
-              0 -0.05em 0 rgba(0, 0, 255, 0.75);
-          }
-          99% {
-            text-shadow:
-              0.025em 0.05em 0 rgba(255, 0, 0, 0.75),
-              0.05em 0 0 rgba(0, 255, 0, 0.75),
-              0 -0.05em 0 rgba(0, 0, 255, 0.75);
-          }
-          100% {
-            text-shadow:
-              -0.025em 0 0 rgba(255, 0, 0, 0.75),
-              -0.025em -0.025em 0 rgba(0, 255, 0, 0.75),
-              -0.025em -0.05em 0 rgba(0, 0, 255, 0.75);
-          }
-        }
-
-        .glitch {
-          animation: glitch 1s linear infinite;
-        }
-
-        @keyframes scanline {
-          0% {
-            transform: translateY(-100%);
-          }
-          100% {
-            transform: translateY(100%);
-          }
-        }
-
-        .scanline {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(
-            to bottom,
-            transparent,
-            rgba(255, 0, 0, 0.2),
-            transparent
-          );
-          pointer-events: none;
-          animation: scanline 10s linear infinite;
-        }
-
-        .button-hover {
-          transition: all 0.3s ease;
-        }
-
-        .button-hover:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 20px rgba(255, 0, 0, 0.5);
-        }
-
-        .calendar-transition {
-          transition: all 0.3s ease;
-        }
-
-        .calendar-transition:hover {
-          background-color: rgba(255, 0, 0, 0.1);
-        }
-
-        @keyframes loadingBar {
-          0% {
-            width: 0;
-          }
-          100% {
-            width: 100%;
-          }
-        }
-
-        .read-article-button {
-          position: relative;
-          border: none; /* Remove default button border */
-          cursor: pointer; /* Change cursor to pointer */
-        }
-
-        .read-article-button:hover {
-          /* Optional: Add box shadow on hover */
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-      `}</style>
-
       <div className="scanline"></div>
-
-      <header className="border-b border-red-800 p-4">
-        <div className="container mx-auto flex items-center justify-between">
-          <h1
-            className="glitch text-2xl font-bold tracking-wider text-red-600"
-            style={{ textShadow: "2px 2px 4px rgba(255,0,0,0.5)" }}
-          >
-            VTSNS<span className="text-white">-Cyberpunk NEWS</span>
-          </h1>
-          <nav className="hidden md:block">
-            <ul className="flex space-x-6">
-              <li>
-                <a href="#" className="transition-colors hover:text-red-400">
-                  Headlines
-                </a>
-              </li>
-              <li>
-                <a href="#" className="transition-colors hover:text-red-400">
-                  Tech
-                </a>
-              </li>
-              <li>
-                <a href="#" className="transition-colors hover:text-red-400">
-                  Politics
-                </a>
-              </li>
-              <li>
-                <a href="#" className="transition-colors hover:text-red-400">
-                  Netwatch
-                </a>
-              </li>
-            </ul>
-          </nav>
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-red-500 hover:bg-red-900/20 hover:text-red-400"
-            >
-              <Search className="h-5 w-5" />
-            </Button>
-            {/* <AudioPlayer /> */}
-            {/* <Testbutton /> */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-red-500 hover:bg-red-900/20 hover:text-red-400 md:hidden"
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-      </header>
 
       <main className="container mx-auto py-8">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="glitch text-3xl font-bold text-white">
-            Breaking News
+          <h2 className="glitch flex text-3xl font-bold text-white">
+            Breaking News{" "}
+            <div
+              className="glitch text-2xl font-bold tracking-wider text-red-600"
+              style={{ textShadow: "2px 2px 4px rgba(255,0,0,0.5)" }}
+            >
+              VTSNS NETRUNNERS
+            </div>
           </h2>
         </div>
         {categories.data ? (
           <div>
-            <PaginatedList />
+            <PaginatedList
+              categories={categories.data}
+              currentCategory={currentcategory}
+              onToggleCategory={ToggleCategory}
+            />
           </div>
         ) : (
           "Loading categories please wait................"
@@ -408,7 +194,7 @@ export default function Component() {
       <footer className="mt-12 border-t border-red-800 bg-gray-900 py-6">
         <div className="container mx-auto text-center">
           <p className="glitch text-red-400">
-            &copy; 2077 CyberNews. All rights augmented.
+            &copy; 2077 CyberNews. All rights augmented by Dusan Bojanic-2024
           </p>
         </div>
       </footer>

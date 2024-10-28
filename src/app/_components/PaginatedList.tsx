@@ -1,0 +1,66 @@
+import { useState } from "react";
+import { Button } from "~/components/ui/button";
+import { type PaginatedListProps } from "~/project-types";
+
+const PaginatedList: React.FC<PaginatedListProps> = ({
+  categories,
+  currentCategory,
+  onToggleCategory,
+}) => {
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const itemsPerPage = 10;
+
+  const startIdx = currentPage * itemsPerPage;
+  const endIdx = startIdx + itemsPerPage;
+  const currentItems = categories.slice(startIdx, endIdx);
+
+  const handleNext = () => {
+    if (endIdx < categories.length) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (startIdx > 0) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
+  return (
+    <div className="mb-6 flex flex-wrap gap-3">
+      <div>
+        <div>
+          Total Available Subjects: {categories.length} , Current Page:{" "}
+          {currentPage + 1}
+        </div>
+        <button
+          className="m-5"
+          onClick={handlePrevious}
+          disabled={currentPage === 0}
+        >
+          Previous
+        </button>
+        <button
+          className="m-5"
+          onClick={handleNext}
+          disabled={endIdx >= categories.length}
+        >
+          Next
+        </button>
+      </div>
+      {currentItems.map((cat) => (
+        <Button
+          key={cat.id}
+          onClick={() => onToggleCategory(cat.name)}
+          className={`button-hover mx-5 my-2 ${
+            currentCategory === cat.name ? "bg-red-600" : "bg-gray-800"
+          } text-white hover:bg-red-700`}
+        >
+          {cat.name}
+        </Button>
+      ))}
+    </div>
+  );
+};
+
+export default PaginatedList;

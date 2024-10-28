@@ -24,31 +24,33 @@ export const postRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       if (input.from && input.to) {
-        const input_to = addDays(input.to, 1);
-      }
-      if (input.subject !== "All") {
-        {
-          const latestArticles2 = await ctx.db.query.article.findMany({
+        const input_to = addDays(input.to, 2);
+        console.log("input_to", input_to);
+
+        if (input.subject !== "All") {
+          {
+            const latestArticles2 = await ctx.db.query.article.findMany({
+              where: (articles, { eq, gte, lte }) =>
+                eq(articles.subject, input.subject) &&
+                gte(articles.createdAt, input.from!) &&
+                lte(articles.createdAt, input_to),
+              orderBy: (articles, { desc }) => [desc(articles.createdAt)],
+              limit: 50,
+            });
+
+            return latestArticles2;
+          }
+        } else if (input.subject === "All") {
+          const latestArticles3 = await ctx.db.query.article.findMany({
             where: (articles, { eq, gte, lte }) =>
               eq(articles.subject, input.subject) &&
               gte(articles.createdAt, input.from!) &&
-              lte(articles.createdAt, input.to!),
+              lte(articles.createdAt, input_to),
             orderBy: (articles, { desc }) => [desc(articles.createdAt)],
             limit: 50,
           });
-
-          return latestArticles2;
+          return latestArticles3;
         }
-      } else if (input.subject === "All") {
-        const latestArticles3 = await ctx.db.query.article.findMany({
-          where: (articles, { eq, gte, lte }) =>
-            eq(articles.subject, input.subject) &&
-            gte(articles.createdAt, input.from!) &&
-            lte(articles.createdAt, input.to!),
-          orderBy: (articles, { desc }) => [desc(articles.createdAt)],
-          limit: 50,
-        });
-        return latestArticles3;
       }
       return [];
     }),
