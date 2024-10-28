@@ -13,77 +13,96 @@ import { format, isWithinInterval, parseISO } from "date-fns";
 import { type DateRange } from "react-day-picker";
 // import Testbutton from "./_components/testbutton";
 import AudioPlayer from "./_components/audioPlayer";
+import { api } from "~/trpc/react";
+import Link from "next/link";
 
 export default function Component() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [category, setCategory] = useState<string>("all");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoading_button, setIsLoading_button] = useState("");
+  const [currentcategory, setcurrentcategory] = useState("All");
+  const [currentArticle, setcurrentArticle] = useState("");
+  const articles = api.post.getLatest_articles.useQuery({
+    subject: currentcategory,
+  });
+  const categories = api.post.getSubjects.useQuery();
 
-  const categories = ["All", "Tech", "Politics", "Culture", "Science"];
+  function ToggleCategory(input: string) {
+    if (currentcategory === input) {
+      setcurrentcategory("All");
+    } else {
+      setcurrentcategory(input);
+    }
+  }
 
-  const articles = [
-    {
-      title: "AI Singularity: The Day Machines Outsmarted Humanity",
-      excerpt:
-        "In a shocking turn of events, artificial intelligence has reached a level of sophistication that surpasses human cognitive abilities...",
-      author: "Zoe Nexus",
-      date: "2024-06-15",
-      readTime: 5,
-      views: 1500000,
-      likes: 95,
-      category: "Tech",
-    },
-    {
-      title: "Cybernetic Implants Now Mandatory for All Citizens",
-      excerpt:
-        "The government has announced a controversial new policy requiring all citizens to undergo cybernetic enhancement...",
-      author: "Rex Voltage",
-      date: "2024-06-14",
-      readTime: 7,
-      views: 2000000,
-      likes: 88,
-      category: "Politics",
-    },
-    {
-      title: "Virtual Reality Addiction Reaches Epidemic Proportions",
-      excerpt:
-        "Hospitals are overwhelmed as millions of people struggle to disconnect from immersive virtual worlds...",
-      author: "Luna Stardust",
-      date: "2077-06-13",
-      readTime: 6,
-      views: 1800000,
-      likes: 92,
-      category: "Culture",
-    },
-    {
-      title: "Megacorporation Wars: The Battle for Neo-Tokyo",
-      excerpt:
-        "Armed conflicts between rival megacorporations have turned the streets of Neo-Tokyo into a battleground...",
-      author: "Blade Runner",
-      date: "2024-06-12",
-      readTime: 8,
-      views: 2500000,
-      likes: 97,
-      category: "Politics",
-    },
-  ];
+  // const categories = ["All", "Tech", "Politics", "Culture", "Science"];
+
+  // const articles = [
+  //   {
+  //     title: "AI Singularity: The Day Machines Outsmarted Humanity",
+  //     excerpt:
+  //       "In a shocking turn of events, artificial intelligence has reached a level of sophistication that surpasses human cognitive abilities...",
+  //     author: "Zoe Nexus",
+  //     date: "2024-06-15",
+  //     readTime: 5,
+  //     views: 1500000,
+  //     likes: 95,
+  //     category: "Tech",
+  //   },
+  //   {
+  //     title: "Cybernetic Implants Now Mandatory for All Citizens",
+  //     excerpt:
+  //       "The government has announced a controversial new policy requiring all citizens to undergo cybernetic enhancement...",
+  //     author: "Rex Voltage",
+  //     date: "2024-06-14",
+  //     readTime: 7,
+  //     views: 2000000,
+  //     likes: 88,
+  //     category: "Politics",
+  //   },
+  //   {
+  //     title: "Virtual Reality Addiction Reaches Epidemic Proportions",
+  //     excerpt:
+  //       "Hospitals are overwhelmed as millions of people struggle to disconnect from immersive virtual worlds...",
+  //     author: "Luna Stardust",
+  //     date: "2077-06-13",
+  //     readTime: 6,
+  //     views: 1800000,
+  //     likes: 92,
+  //     category: "Culture",
+  //   },
+  //   {
+  //     title: "Megacorporation Wars: The Battle for Neo-Tokyo",
+  //     excerpt:
+  //       "Armed conflicts between rival megacorporations have turned the streets of Neo-Tokyo into a battleground...",
+  //     author: "Blade Runner",
+  //     date: "2024-06-12",
+  //     readTime: 8,
+  //     views: 2500000,
+  //     likes: 97,
+  //     category: "Politics",
+  //   },
+  // ];
 
   function handle_loading_animation(boolean: boolean, string: string) {
     setIsLoading(boolean);
     setIsLoading_button(string);
   }
 
-  const filteredArticles = articles.filter(
-    (article) =>
-      (category === "All" || article.category === category) &&
-      (!dateRange?.from ||
-        !dateRange.to ||
-        isWithinInterval(parseISO(article.date), {
-          start: dateRange.from,
-          end: dateRange.to,
-        })),
-  );
+  function filteredArticles() {
+    const newarticles = articles.data!.filter(
+      (article) =>
+        (currentcategory === "All" || article.subject === currentcategory) &&
+        (!dateRange?.from ||
+          !dateRange.to ||
+          isWithinInterval(parseISO(article.createdAt.toISOString()), {
+            start: dateRange.from,
+            end: dateRange.to,
+          })),
+    );
+    return newarticles;
+  }
 
   return (
     <div className="min-h-screen bg-black text-red-500">
@@ -263,14 +282,14 @@ export default function Component() {
         </div>
 
         <div className="mb-6 flex flex-wrap gap-4">
-          {categories.map((cat) => (
+          {categories.data?.map((cat) => (
             <Button
-              key={cat}
-              onClick={() => setCategory(cat)}
-              className={`button-hover ${category === cat ? "bg-red-600" : "bg-gray-800"} text-white hover:bg-red-700`}
+              key={cat.id}
+              onClick={() => ToggleCategory(cat.name)}
+              className={`button-hover ${category === cat.name ? "bg-red-600" : "bg-gray-800"} text-white hover:bg-red-700`}
             >
-              {cat}
-              <span className="ml-2 text-xs">Subscribe</span>
+              {cat.name}
+              {/* <span className="ml-2 text-xs">Subscribe</span> */}
             </Button>
           ))}
         </div>
@@ -313,72 +332,88 @@ export default function Component() {
           </Popover>
         </div>
 
-        <div className="space-y-6">
-          {filteredArticles.map((article, index) => (
-            <div
-              key={index}
-              className="overflow-hidden rounded-lg border border-red-800 bg-gray-900 p-6 transition-shadow hover:shadow-lg hover:shadow-red-500/20"
-            >
-              <h3 className="glitch mb-2 text-2xl font-semibold text-white">
-                {article.title}
-              </h3>
-              <p className="mb-4 text-red-300">{article.excerpt}</p>
-              <div className="mb-4 flex items-center justify-between text-sm text-red-400">
-                <span>{article.author}</span>
-                <span>{article.date}</span>
-              </div>
-              <div className="mb-4 flex items-center space-x-4">
-                <div className="flex items-center">
-                  <Clock className="mr-1 h-4 w-4" />
-                  <span className="text-sm">{article.readTime} min read</span>
-                </div>
-                <div className="flex items-center">
-                  <Eye className="mr-1 h-4 w-4" />
-                  <span className="text-sm">
-                    {article.views.toLocaleString()} views
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <ThumbsUp className="mr-1 h-4 w-4" />
-                  <span className="text-sm">{article.likes}% engagement</span>
-                </div>
-              </div>
-              <div className="mb-4">
-                <p className="mb-1 text-sm text-red-300">Engagement</p>
-                <Progress value={article.likes} className="h-2 bg-red-900">
-                  <div
-                    className="h-full bg-red-500 transition-all duration-500 ease-in-out"
-                    style={{ width: `${article.likes}%` }}
-                  />
-                </Progress>
-              </div>
-              <button
-                className={`read-article-button relative w-full overflow-hidden bg-red-600 py-2 text-white transition-colors duration-300`}
-                onMouseEnter={() =>
-                  handle_loading_animation(true, article.title)
-                }
-                onMouseLeave={() => handle_loading_animation(false, "")}
+        {articles.data && (
+          <div className="space-y-6">
+            {filteredArticles().map((article, index) => (
+              <div
+                key={index}
+                className="overflow-hidden rounded-lg border border-red-800 bg-gray-900 p-6 transition-shadow hover:shadow-lg hover:shadow-red-500/20"
               >
-                <span
-                  className={`absolute inset-0 z-10 h-full w-full transition-transform duration-300 ${
-                    isLoading && article.title === isLoading_button
-                      ? "translate-x-0 transform bg-red-700"
-                      : "-translate-x-full transform"
-                  }`}
-                  style={{
-                    transition: "transform 1s ease-in-out",
-                  }}
-                />
-                <span className="relative z-10">
-                  {isLoading && article.title === isLoading_button
-                    ? "PENETRATING FIREWALL"
-                    : "Read Full Article"}
-                  {/* <ChevronRight className="ml-2 h-4 w-4" /> */}
-                </span>
-              </button>
-            </div>
-          ))}
-        </div>
+                <h3 className="glitch mb-2 text-2xl font-semibold text-white">
+                  {article.subject} - {article.title}
+                </h3>
+                {/* <p className="mb-4 text-red-300">{article.excerpt}</p> */}
+                <div className="mb-4 flex items-center justify-between text-sm text-red-400">
+                  {/* <span>{article.author}</span> */}
+                  <span>{article.createdAt.toDateString()}</span>
+                </div>
+                <div className="mb-4 flex items-center space-x-4">
+                  <div className="flex items-center">
+                    <Clock className="mr-1 h-4 w-4" />
+                    {/* <span className="text-sm">{article.readTime} min read</span> */}
+                  </div>
+                  <div className="flex items-center">
+                    <Eye className="mr-1 h-4 w-4" />
+                    {/* <span className="text-sm">
+                      {article.views.toLocaleString()} views
+                    </span> */}
+                  </div>
+                  <div className="flex items-center">
+                    <ThumbsUp className="mr-1 h-4 w-4" />
+                    {/* <span className="text-sm">{article.likes}% engagement</span> */}
+                  </div>
+                </div>
+                {/* <div className="mb-4">
+                  <p className="mb-1 text-sm text-red-300">Engagement</p>
+                  <Progress value={article.likes} className="h-2 bg-red-900">
+                    <div
+                      className="h-full bg-red-500 transition-all duration-500 ease-in-out"
+                      style={{ width: `${article.likes}%` }}
+                    />
+                  </Progress>
+                </div> */}
+                {currentArticle === article.href_title_date && (
+                  <div className="mb-4 flex items-center justify-between text-sm text-red-400">
+                    {article.text}
+                  </div>
+                )}{" "}
+                {currentArticle !== article.href_title_date && (
+                  <button
+                    onClick={() => {
+                      setcurrentArticle(article.href_title_date);
+                      //  console.log("bla bla bla");
+                    }}
+                    className={`read-article-button relative w-full overflow-hidden bg-red-600 py-2 text-white transition-colors duration-300`}
+                    onMouseEnter={() =>
+                      handle_loading_animation(true, article.title)
+                    }
+                    onMouseLeave={() => handle_loading_animation(false, "")}
+                  >
+                    <div
+                      className={`absolute inset-0 z-10 h-full w-full transition-transform duration-300 ${
+                        isLoading && article.title === isLoading_button
+                          ? "translate-x-0 transform bg-red-700"
+                          : "-translate-x-full transform"
+                      }`}
+                      style={{
+                        transition: "transform 1s ease-in-out",
+                      }}
+                    />
+
+                    {/* {currentArticle} */}
+
+                    <div className="relative z-10">
+                      {isLoading && article.title === isLoading_button
+                        ? "PENETRATING FIREWALL"
+                        : "Read Full Article"}
+                      {/* <ChevronRight className="ml-2 h-4 w-4" /> */}
+                    </div>
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </main>
 
       <footer className="mt-12 border-t border-red-800 bg-gray-900 py-6">

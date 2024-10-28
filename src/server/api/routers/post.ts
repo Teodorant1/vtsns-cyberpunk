@@ -7,12 +7,37 @@ import {
 } from "~/server/api/trpc";
 import { posts } from "~/server/db/schema";
 import {
-  scrape_vtsns_article,
-  scrape_Predmeti_info,
+  // scrape_vtsns_article,
+  // scrape_Predmeti_info,
   scrape_vtsns_CRONJOB,
 } from "~/utilities/random-functions";
 
 export const postRouter = createTRPCRouter({
+  getLatest_articles: publicProcedure
+    .input(z.object({ subject: z.string() }))
+    .query(async ({ ctx, input }) => {
+      if (input.subject !== "All") {
+        const latestArticles = await ctx.db.query.article.findMany({
+          where: (articles, { eq }) => eq(articles.subject, input.subject),
+          orderBy: (articles, { desc }) => [desc(articles.createdAt)],
+          limit: 50,
+        });
+
+        return latestArticles ?? [];
+      }
+
+      const latestArticles = await ctx.db.query.article.findMany({
+        orderBy: (articles, { desc }) => [desc(articles.createdAt)],
+        limit: 50,
+      });
+
+      return latestArticles ?? [];
+    }),
+  getSubjects: publicProcedure.query(async ({ ctx }) => {
+    const subjects = await ctx.db.query.subject.findMany({});
+    return subjects ?? [];
+  }),
+
   test_web_scraper: publicProcedure.mutation(async ({ ctx, input }) => {
     const value0 = await scrape_vtsns_CRONJOB();
     // const value1 = await scrape_Predmeti_info();
