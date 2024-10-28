@@ -37,8 +37,14 @@ export default function FAQPage() {
     <div className="min-h-screen bg-black text-red-500">
       <div className="scanline"></div>
       <main className="container mx-auto py-8">
-        <h1 className="glitch mb-8 text-3xl font-bold text-white">
-          Web Scraping FAQ
+        <h1 className="glitch mb-8 flex items-center text-3xl font-bold text-white">
+          Web Scraping{" "}
+          <h1
+            className="glitch mx-5 flex text-2xl font-bold tracking-wider text-red-600"
+            style={{ textShadow: "2px 2px 4px rgba(255,0,0,0.5)" }}
+          >
+            FAQ
+          </h1>
         </h1>
         <section className="space-y-6">
           {faqs.map((faq) => (

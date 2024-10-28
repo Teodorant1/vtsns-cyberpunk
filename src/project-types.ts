@@ -36,3 +36,7 @@ export interface PaginatedListProps {
   currentCategory: string;
   onToggleCategory: (category: string) => void;
 }
+
+export interface HrefLinksProps {
+  hrefs: string[];
+}

@@ -48,17 +48,20 @@ const PaginatedList: React.FC<PaginatedListProps> = ({
           Next
         </button>
       </div>
-      {currentItems.map((cat) => (
-        <Button
-          key={cat.id}
-          onClick={() => onToggleCategory(cat.name)}
-          className={`button-hover mx-5 my-2 ${
-            currentCategory === cat.name ? "bg-red-600" : "bg-gray-800"
-          } text-white hover:bg-red-700`}
-        >
-          {cat.name}
-        </Button>
-      ))}
+      <div>
+        {" "}
+        {currentItems.map((cat) => (
+          <Button
+            key={cat.id}
+            onClick={() => onToggleCategory(cat.name)}
+            className={`button-hover mx-2 my-1 ${
+              currentCategory === cat.name ? "bg-red-600" : "bg-gray-800"
+            } text-white hover:bg-red-700`}
+          >
+            {cat.name}
+          </Button>
+        ))}
+      </div>
     </div>
   );
 };
