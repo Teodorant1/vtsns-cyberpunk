@@ -241,7 +241,7 @@ export default function Component() {
             className="glitch text-2xl font-bold tracking-wider text-red-600"
             style={{ textShadow: "2px 2px 4px rgba(255,0,0,0.5)" }}
           >
-            CYBER<span className="text-white">NEWS</span>
+            VTSNS<span className="text-white">-Cyberpunk NEWS</span>
           </h1>
           <nav className="hidden md:block">
             <ul className="flex space-x-6">
