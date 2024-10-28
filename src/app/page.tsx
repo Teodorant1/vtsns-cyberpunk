@@ -12,9 +12,9 @@ import {
 import { format, isWithinInterval, parseISO } from "date-fns";
 import { type DateRange } from "react-day-picker";
 // import Testbutton from "./_components/testbutton";
-import AudioPlayer from "./_components/audioPlayer";
+// import AudioPlayer from "./_components/audioPlayer";
 import { api } from "~/trpc/react";
-import Link from "next/link";
+// import Link from "next/link";
 
 export default function Component() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
@@ -261,7 +261,7 @@ export default function Component() {
             >
               <Search className="h-5 w-5" />
             </Button>
-            <AudioPlayer />
+            {/* <AudioPlayer /> */}
             {/* <Testbutton /> */}
             <Button
               variant="ghost"
