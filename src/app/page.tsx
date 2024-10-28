@@ -1,15 +1,14 @@
 "use client";
 import { useState } from "react";
-import { Search, Menu, Eye, Clock, ThumbsUp, Calendar } from "lucide-react";
+import { Search, Menu, Clock, Calendar } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { Progress } from "~/components/ui/progress";
 import { Calendar as CalendarComponent } from "~/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
-import { format, isWithinInterval, parseISO } from "date-fns";
+import { addDays, format, isWithinInterval, parseISO, subDays } from "date-fns";
 import { type DateRange } from "react-day-picker";
 // import Testbutton from "./_components/testbutton";
 // import AudioPlayer from "./_components/audioPlayer";
@@ -17,14 +16,19 @@ import { api } from "~/trpc/react";
 // import Link from "next/link";
 
 export default function Component() {
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const [category, setCategory] = useState<string>("all");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 7),
+    to: addDays(new Date(), 1),
+  });
+  // const [category, setCategory] = useState<string>("all");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoading_button, setIsLoading_button] = useState("");
   const [currentcategory, setcurrentcategory] = useState("All");
   const [currentArticle, setcurrentArticle] = useState("");
   const articles = api.post.getLatest_articles.useQuery({
     subject: currentcategory,
+    from: dateRange?.from,
+    to: dateRange?.to,
   });
   const categories = api.post.getSubjects.useQuery();
 
@@ -35,55 +39,6 @@ export default function Component() {
       setcurrentcategory(input);
     }
   }
-
-  // const categories = ["All", "Tech", "Politics", "Culture", "Science"];
-
-  // const articles = [
-  //   {
-  //     title: "AI Singularity: The Day Machines Outsmarted Humanity",
-  //     excerpt:
-  //       "In a shocking turn of events, artificial intelligence has reached a level of sophistication that surpasses human cognitive abilities...",
-  //     author: "Zoe Nexus",
-  //     date: "2024-06-15",
-  //     readTime: 5,
-  //     views: 1500000,
-  //     likes: 95,
-  //     category: "Tech",
-  //   },
-  //   {
-  //     title: "Cybernetic Implants Now Mandatory for All Citizens",
-  //     excerpt:
-  //       "The government has announced a controversial new policy requiring all citizens to undergo cybernetic enhancement...",
-  //     author: "Rex Voltage",
-  //     date: "2024-06-14",
-  //     readTime: 7,
-  //     views: 2000000,
-  //     likes: 88,
-  //     category: "Politics",
-  //   },
-  //   {
-  //     title: "Virtual Reality Addiction Reaches Epidemic Proportions",
-  //     excerpt:
-  //       "Hospitals are overwhelmed as millions of people struggle to disconnect from immersive virtual worlds...",
-  //     author: "Luna Stardust",
-  //     date: "2077-06-13",
-  //     readTime: 6,
-  //     views: 1800000,
-  //     likes: 92,
-  //     category: "Culture",
-  //   },
-  //   {
-  //     title: "Megacorporation Wars: The Battle for Neo-Tokyo",
-  //     excerpt:
-  //       "Armed conflicts between rival megacorporations have turned the streets of Neo-Tokyo into a battleground...",
-  //     author: "Blade Runner",
-  //     date: "2024-06-12",
-  //     readTime: 8,
-  //     views: 2500000,
-  //     likes: 97,
-  //     category: "Politics",
-  //   },
-  // ];
 
   function handle_loading_animation(boolean: boolean, string: string) {
     setIsLoading(boolean);
@@ -102,6 +57,65 @@ export default function Component() {
           })),
     );
     return newarticles;
+  }
+
+  function PaginatedList() {
+    const [currentPage, setCurrentPage] = useState<number>(0);
+    const itemsPerPage = 10;
+
+    const startIdx = currentPage * itemsPerPage;
+    const endIdx = startIdx + itemsPerPage;
+    const currentItems = categories.data!.slice(startIdx, endIdx);
+
+    const handleNext = () => {
+      if (endIdx < categories.data!.length) {
+        setCurrentPage((prev) => prev + 1);
+      }
+    };
+
+    const handlePrevious = () => {
+      if (startIdx > 0) {
+        setCurrentPage((prev) => prev - 1);
+      }
+    };
+
+    return (
+      <div className="mb-6 flex flex-wrap gap-3">
+        <div>
+          {" "}
+          <div>
+            <div>
+              Total Available Subjects: {categories.data!.length} , Current
+              Page: {currentPage + 1}{" "}
+            </div>
+            <button
+              className="m-5"
+              onClick={handlePrevious}
+              disabled={currentPage === 0}
+            >
+              Previous
+            </button>
+            <button
+              className="m-5"
+              onClick={handleNext}
+              disabled={endIdx >= categories.data!.length}
+            >
+              Next
+            </button>
+          </div>
+          {currentItems.map((cat, index) => (
+            <Button
+              key={cat.id}
+              onClick={() => ToggleCategory(cat.name)}
+              className={`button-hover mx-5 my-2 ${currentcategory === cat.name ? "bg-red-600" : "bg-gray-800"} text-white hover:bg-red-700`}
+            >
+              {cat.name}
+              {/* <span className="ml-2 text-xs">Subscribe</span> */}
+            </Button>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -280,19 +294,13 @@ export default function Component() {
             Breaking News
           </h2>
         </div>
-
-        <div className="mb-6 flex flex-wrap gap-4">
-          {categories.data?.map((cat) => (
-            <Button
-              key={cat.id}
-              onClick={() => ToggleCategory(cat.name)}
-              className={`button-hover ${category === cat.name ? "bg-red-600" : "bg-gray-800"} text-white hover:bg-red-700`}
-            >
-              {cat.name}
-              {/* <span className="ml-2 text-xs">Subscribe</span> */}
-            </Button>
-          ))}
-        </div>
+        {categories.data ? (
+          <div>
+            <PaginatedList />
+          </div>
+        ) : (
+          "Loading categories please wait................"
+        )}
 
         <div className="mb-6 flex space-x-4">
           <Popover>
@@ -332,7 +340,7 @@ export default function Component() {
           </Popover>
         </div>
 
-        {articles.data && (
+        {articles.data && dateRange?.from && dateRange.to ? (
           <div className="space-y-6">
             {filteredArticles().map((article, index) => (
               <div
@@ -343,35 +351,14 @@ export default function Component() {
                   {article.subject} - {article.title}
                 </h3>
                 {/* <p className="mb-4 text-red-300">{article.excerpt}</p> */}
-                <div className="mb-4 flex items-center justify-between text-sm text-red-400">
-                  {/* <span>{article.author}</span> */}
-                  <span>{article.createdAt.toDateString()}</span>
-                </div>
                 <div className="mb-4 flex items-center space-x-4">
                   <div className="flex items-center">
-                    <Clock className="mr-1 h-4 w-4" />
-                    {/* <span className="text-sm">{article.readTime} min read</span> */}
-                  </div>
-                  <div className="flex items-center">
-                    <Eye className="mr-1 h-4 w-4" />
-                    {/* <span className="text-sm">
-                      {article.views.toLocaleString()} views
-                    </span> */}
-                  </div>
-                  <div className="flex items-center">
-                    <ThumbsUp className="mr-1 h-4 w-4" />
-                    {/* <span className="text-sm">{article.likes}% engagement</span> */}
+                    <div className="mb-4 flex items-center justify-between text-sm text-red-400">
+                      <Clock className="mr-1 h-4 w-4" />
+                      <span>{article.createdAt.toDateString()}</span>
+                    </div>
                   </div>
                 </div>
-                {/* <div className="mb-4">
-                  <p className="mb-1 text-sm text-red-300">Engagement</p>
-                  <Progress value={article.likes} className="h-2 bg-red-900">
-                    <div
-                      className="h-full bg-red-500 transition-all duration-500 ease-in-out"
-                      style={{ width: `${article.likes}%` }}
-                    />
-                  </Progress>
-                </div> */}
                 {currentArticle === article.href_title_date && (
                   <div className="mb-4 flex items-center justify-between text-sm text-red-400">
                     {article.text}
@@ -404,7 +391,7 @@ export default function Component() {
 
                     <div className="relative z-10">
                       {isLoading && article.title === isLoading_button
-                        ? "PENETRATING FIREWALL"
+                        ? "PENETRATING MEGACORPORATION FIREWALL"
                         : "Read Full Article"}
                       {/* <ChevronRight className="ml-2 h-4 w-4" /> */}
                     </div>
@@ -413,6 +400,8 @@ export default function Component() {
               </div>
             ))}
           </div>
+        ) : (
+          "Loading Articles please wait........"
         )}
       </main>
 

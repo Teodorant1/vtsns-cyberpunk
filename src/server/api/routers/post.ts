@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { addDays } from "date-fns";
 
 import {
   createTRPCRouter,
@@ -14,24 +15,42 @@ import {
 
 export const postRouter = createTRPCRouter({
   getLatest_articles: publicProcedure
-    .input(z.object({ subject: z.string() }))
+    .input(
+      z.object({
+        subject: z.string(),
+        from: z.date().optional(),
+        to: z.date().optional(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
+      if (input.from && input.to) {
+        const input_to = addDays(input.to, 1);
+      }
       if (input.subject !== "All") {
-        const latestArticles = await ctx.db.query.article.findMany({
-          where: (articles, { eq }) => eq(articles.subject, input.subject),
+        {
+          const latestArticles2 = await ctx.db.query.article.findMany({
+            where: (articles, { eq, gte, lte }) =>
+              eq(articles.subject, input.subject) &&
+              gte(articles.createdAt, input.from!) &&
+              lte(articles.createdAt, input.to!),
+            orderBy: (articles, { desc }) => [desc(articles.createdAt)],
+            limit: 50,
+          });
+
+          return latestArticles2;
+        }
+      } else if (input.subject === "All") {
+        const latestArticles3 = await ctx.db.query.article.findMany({
+          where: (articles, { eq, gte, lte }) =>
+            eq(articles.subject, input.subject) &&
+            gte(articles.createdAt, input.from!) &&
+            lte(articles.createdAt, input.to!),
           orderBy: (articles, { desc }) => [desc(articles.createdAt)],
           limit: 50,
         });
-
-        return latestArticles ?? [];
+        return latestArticles3;
       }
-
-      const latestArticles = await ctx.db.query.article.findMany({
-        orderBy: (articles, { desc }) => [desc(articles.createdAt)],
-        limit: 50,
-      });
-
-      return latestArticles ?? [];
+      return [];
     }),
   getSubjects: publicProcedure.query(async ({ ctx }) => {
     const subjects = await ctx.db.query.subject.findMany({});
