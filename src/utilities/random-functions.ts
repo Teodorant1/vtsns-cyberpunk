@@ -144,9 +144,12 @@ export async function shouldRunJob() {
   const lastRunTime = new Date(latestRun.runDate);
   const hoursDifference =
     (currentTime.getTime() - lastRunTime.getTime()) / (1000 * 60 * 60);
+  const minutesDifference =
+    (currentTime.getTime() - lastRunTime.getTime()) / (1000 * 60);
 
   // Return true if at least 1 hours have passed since the last run
-  return hoursDifference >= 1;
+  // return hoursDifference >= 1;
+  return minutesDifference >= 4;
 }
 
 //we want to grab all of the scraped data from the predmeti-info page , check if they exist, or else just upsert them
