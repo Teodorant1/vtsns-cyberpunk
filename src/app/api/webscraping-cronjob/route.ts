@@ -15,7 +15,8 @@ export async function POST(request: Request) {
     // Parse the JSON body and assert the type
 
     const should_run_cron = await shouldRunJob();
-    if (should_run_cron === true) {
+    // if (should_run_cron === true) {
+    if (1 > 0) {
       await scrape_vtsns_CRONJOB();
       const currentTime = new Date();
       await db.insert(jobRuns).values({
