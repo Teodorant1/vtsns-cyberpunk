@@ -11,6 +11,7 @@ import {
   timestamp,
   uuid,
   varchar,
+  PgArray,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 
@@ -38,7 +39,11 @@ export const article = createTable(
       .notNull()
       .unique(),
     text: text("content").notNull(), // Large text field for the essay content
-    hrefs: jsonb("hrefs").default("[]"), // Using JSONB to store an array of hrefs
+    href_links: text("href_links")
+      .array()
+      .notNull()
+      .default(sql`'{}'::text[]`), // roles:  array(varchar('role', { length: 50 })) // Defining an array of strings (roles)
+
     createdAt: timestamp("created_at", { withTimezone: true })
       // .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
@@ -53,6 +58,7 @@ export const article = createTable(
   //   ),
   // }),
 );
+export type article_type = typeof article.$inferSelect;
 
 export const subject = createTable("subject", {
   id: serial("id").primaryKey(), // Auto-incrementing primary key for hrefs
