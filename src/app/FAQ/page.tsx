@@ -12,6 +12,11 @@ export default function FAQPage() {
 
   const faqs = [
     {
+      question: "Is this FAQ serious?",
+      answer:
+        "This FAQ is written with the help of ChatGPT to make it sounds like Johnny Silverhand from Cyberpunk RPG answered all of the questions.",
+    },
+    {
       question: "What is Web Scraping?",
       answer:
         "Web scraping’s the closest you’ll get to liberation in this digital hellhole. It’s ripping out data from websites, bending it to your will.",
