@@ -5,11 +5,6 @@ export interface CalendarDateRangePickerProps {
   date: DateRange | undefined;
   setDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
 }
-
-export interface RequestData {
-  name: string;
-  age: number;
-}
 export interface PostData {
   date: Date | null;
   title: string;
@@ -38,5 +33,5 @@ export interface PaginatedListProps {
 }
 
 export interface HrefLinksProps {
-  hrefs: string[];
+  href_links: string[]; // Define an interface for props
 }

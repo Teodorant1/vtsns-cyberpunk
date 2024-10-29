@@ -158,6 +158,12 @@ export async function scrape_vtsns_CRONJOB() {
   for (let i = 0; i < article_page.length; i++) {
     // const article = article_page[i]!; // Await the individual promise if each item is still a promise
     // const hrefLinks_string = article!.article.hrefLinks.toString();
+
+    const new_hreflinks = [
+      ...article_page[i]!.article.hrefLinks,
+      article_page[i]!.href,
+    ];
+
     await upsertArticle(
       article_page[i]!.title_analysis.title,
       article_page[i]!.title_analysis.subject,
@@ -166,7 +172,7 @@ export async function scrape_vtsns_CRONJOB() {
       article_page[i]!.title_analysis.is_general_announcement,
       article_page[i]!.date!,
       article_page[i]!.href,
-      article_page[i]!.article.hrefLinks ?? [],
+      new_hreflinks ?? [],
     ); // Process each article
 
     if (article_page[i]!.title_analysis.is_general_announcement === false) {
@@ -224,6 +230,7 @@ async function upsertArticle(
         href_links: hrefs ?? [],
         createdAt: Date,
         isSpecial_announcement: isSpecial_announcement,
+        href: href_url,
       },
     });
 }

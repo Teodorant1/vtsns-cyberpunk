@@ -14,6 +14,7 @@ import PaginatedList from "./_components/PaginatedList";
 // import Testbutton from "./_components/testbutton";
 // import AudioPlayer from "./_components/audioPlayer";
 import { api } from "~/trpc/react";
+import HrefLinks from "./_components/href_list";
 // import Link from "next/link";
 
 export default function Component() {
@@ -146,14 +147,13 @@ export default function Component() {
                   </div>
                 </div>
                 {currentArticle === article.href_title_date && (
-                  <div className="mb-4 flex items-center justify-between text-sm text-red-400">
+                  <div className="mb-4 items-center justify-between text-sm text-red-400">
                     <p>{article.text}</p>
-                    {/* {(article.hrefs as string) && (
-                      <p>{article.hrefs as string}</p>
-                    )} */}
-                    {/* {article.hrefs && article.hrefs.length > 0 && (
-                      <HrefLinks hrefs={article.hrefs} />
-                    )}{" "} */}
+                    <p>
+                      {article.href_links && article.href_links.length > 0 && (
+                        <HrefLinks href_links={article.href_links} />
+                      )}{" "}
+                    </p>
                   </div>
                 )}{" "}
                 {currentArticle !== article.href_title_date && (
