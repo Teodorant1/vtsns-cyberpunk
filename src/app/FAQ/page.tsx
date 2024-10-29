@@ -14,7 +14,7 @@ export default function FAQPage() {
     {
       question: "What is this website?",
       answer:
-        "This website is an article aggregator for the  announcements page at https://vtsns.edu.rs/predmeti-info/ , I made this app because that page is bugged and constantly shows old articles and it doesn't have any filtering capabilities. Because of that I made my own version and put a Cyberpunk spin on it",
+        "This website is an article aggregator for the  announcements page at https://vtsns.edu.rs/predmeti-info/ , I made this app because that page is bugged and constantly shows old articles and it doesn't have any filtering capabilities. Because of that I made my own version and put a Cyberpunk spin on it.",
     },
     {
       question: "What is Web Scraping?",
