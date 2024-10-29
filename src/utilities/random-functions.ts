@@ -165,6 +165,7 @@ export async function scrape_vtsns_CRONJOB() {
       article_page[i]!.article.combinedText,
       article_page[i]!.title_analysis.is_general_announcement,
       article_page[i]!.date!,
+      article_page[i]!.href,
       article_page[i]!.article.hrefLinks ?? [],
     ); // Process each article
 
@@ -197,6 +198,7 @@ async function upsertArticle(
   text: string,
   isSpecial_announcement: boolean,
   Date: Date,
+  href_url: string,
   hrefs?: string[],
 ) {
   await db
@@ -210,6 +212,7 @@ async function upsertArticle(
       createdAt: Date,
       updatedAt: Date,
       isSpecial_announcement: isSpecial_announcement,
+      href: href_url,
     })
     .onConflictDoUpdate({
       target: [article.href_title_date], // Define conflict on the unique column

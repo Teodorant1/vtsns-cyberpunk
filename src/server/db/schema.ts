@@ -35,11 +35,12 @@ export const article = createTable(
       .default(sql`gen_random_uuid()`), // Use default UUID generation
     title: varchar("title", { length: 1000 }).notNull(),
     subject: varchar("subject", { length: 1000 }).notNull(),
+    href: varchar("href", { length: 1500 }).notNull().unique(),
     href_title_date: varchar("href_title_date", { length: 1500 })
       .notNull()
       .unique(),
     text: text("content").notNull(), // Large text field for the essay content
-    href_links: text("href_links")
+    href_links: varchar("href_links", { length: 1000 })
       .array()
       .notNull()
       .default(sql`'{}'::text[]`), // roles:  array(varchar('role', { length: 50 })) // Defining an array of strings (roles)
