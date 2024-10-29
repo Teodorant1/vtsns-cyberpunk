@@ -12,19 +12,19 @@ export default function FAQPage() {
 
   const faqs = [
     {
-      question: "Is this FAQ serious?",
+      question: "What is this website?",
       answer:
-        "This FAQ is written with the help of ChatGPT to make it sounds like Johnny Silverhand from Cyberpunk RPG answered all of the questions.",
+        "This website is an article aggregator for the  announcements page at https://vtsns.edu.rs/predmeti-info/ , I made this app because that page is bugged and constantly shows old articles and it doesn't have any filtering capabilities. Because of that I made my own version and put a Cyberpunk spin on it",
     },
     {
       question: "What is Web Scraping?",
       answer:
-        "Web scraping’s the closest you’ll get to liberation in this digital hellhole. It’s ripping out data from websites, bending it to your will.",
+        "Web scraping’s the closest you’ll get to liberation in this cyberpunk dystopia. It’s ripping out data from websites, bending it to your will.",
     },
     {
       question: "Is Web Scraping legal?",
       answer:
-        "Depends. Corporations will scream it’s illegal, but they’ve always been hypocrites. If you’re smart, you don’t leave a trace.",
+        "Depends. Megacorporations will scream it’s illegal, but they’ve always been hypocrites. If you’re smart, you don’t leave a trace.",
     },
     {
       question: "Do I need coding skills?",
@@ -54,6 +54,7 @@ export default function FAQPage() {
         <section className="space-y-6">
           {faqs.map((faq) => (
             <div
+              onClick={() => toggleQuestion(faq.question)}
               key={faq.question}
               className={`overflow-hidden rounded-lg border border-red-800 bg-gray-900 p-6 transition-shadow ${
                 activeQuestion === faq.question
@@ -62,16 +63,9 @@ export default function FAQPage() {
               }`}
             >
               <div className="flex items-center justify-between">
-                <h3
-                  onClick={() => toggleQuestion(faq.question)}
-                  className="glitch cursor-pointer text-xl font-semibold"
-                >
+                <h3 className="glitch cursor-pointer text-xl font-semibold">
                   {faq.question}
                 </h3>
-                <Clock
-                  className="h-6 w-6 cursor-pointer text-red-400"
-                  onClick={() => toggleQuestion(faq.question)}
-                />
               </div>
               {activeQuestion === faq.question && (
                 <p className="animate-slide-fade-in mt-4 text-red-300">
