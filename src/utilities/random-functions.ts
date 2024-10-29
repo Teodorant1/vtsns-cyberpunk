@@ -14,8 +14,6 @@ export async function scrape_Predmeti_info() {
   const { body } = await got("https://vtsns.edu.rs/predmeti-info/");
   const $ = load(body); // Use load to parse the HTML
 
-  const postsData: PostData[] = [];
-
   // Array to hold promises
   const postPromises: Promise<PostData>[] = [];
 
@@ -60,7 +58,7 @@ export async function scrape_vtsns_article(url: string) {
     .get();
 
   // Extract all href values from <a> elements
-  const hrefLinks = $(".content-block a")
+  const hrefLinks = $(".post-content a")
     .map((_, element) => $(element).attr("href") ?? "")
     .get();
 
