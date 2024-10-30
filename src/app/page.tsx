@@ -164,13 +164,17 @@ export default function Component() {
                     }}
                     className={`read-article-button relative w-full overflow-hidden bg-red-600 py-2 text-white transition-colors duration-300`}
                     onMouseEnter={() =>
-                      handle_loading_animation(true, article.title)
+                      handle_loading_animation(
+                        true,
+                        article.title + article.href,
+                      )
                     }
                     onMouseLeave={() => handle_loading_animation(false, "")}
                   >
                     <div
                       className={`absolute inset-0 z-10 h-full w-full transition-transform duration-300 ${
-                        isLoading && article.title === isLoading_button
+                        isLoading &&
+                        article.title + article.href === isLoading_button
                           ? "translate-x-0 transform bg-red-700"
                           : "-translate-x-full transform"
                       }`}
