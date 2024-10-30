@@ -25,7 +25,7 @@ export const postRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       if (input.from && input.to) {
         const input_to = addDays(input.to, 2);
-        console.log("input_to", input_to);
+        console.log("getting latest articles");
 
         if (input.subject !== "All") {
           {
@@ -55,6 +55,8 @@ export const postRouter = createTRPCRouter({
       return [];
     }),
   getSubjects: publicProcedure.query(async ({ ctx }) => {
+    console.log("getting subjects");
+
     const subjects = await ctx.db.query.subject.findMany({});
     return subjects ?? [];
   }),
