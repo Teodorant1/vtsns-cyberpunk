@@ -191,7 +191,11 @@ export default function Component() {
                     {/* {currentArticle} */}
 
                     <div className="relative z-10">
-                      {isLoading && article.title === isLoading_button
+                      {isLoading &&
+                      article.title +
+                        article.href +
+                        article.createdAt.toISOString() ===
+                        isLoading_button
                         ? "PENETRATING MEGACORPORATION FIREWALL"
                         : "Read Full Article"}
                       {/* <ChevronRight className="ml-2 h-4 w-4" /> */}
