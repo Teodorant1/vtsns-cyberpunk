@@ -166,7 +166,9 @@ export default function Component() {
                     onMouseEnter={() =>
                       handle_loading_animation(
                         true,
-                        article.title + article.href,
+                        article.title +
+                          article.href +
+                          article.createdAt.toISOString(),
                       )
                     }
                     onMouseLeave={() => handle_loading_animation(false, "")}
@@ -174,7 +176,10 @@ export default function Component() {
                     <div
                       className={`absolute inset-0 z-10 h-full w-full transition-transform duration-300 ${
                         isLoading &&
-                        article.title + article.href === isLoading_button
+                        article.title +
+                          article.href +
+                          article.createdAt.toISOString() ===
+                          isLoading_button
                           ? "translate-x-0 transform bg-red-700"
                           : "-translate-x-full transform"
                       }`}
