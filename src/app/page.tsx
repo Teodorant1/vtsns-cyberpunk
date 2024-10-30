@@ -164,22 +164,14 @@ export default function Component() {
                     }}
                     className={`read-article-button relative w-full overflow-hidden bg-red-600 py-2 text-white transition-colors duration-300`}
                     onMouseEnter={() =>
-                      handle_loading_animation(
-                        true,
-                        article.title +
-                          article.href +
-                          article.createdAt.toISOString(),
-                      )
+                      handle_loading_animation(true, article.href_title_date)
                     }
                     onMouseLeave={() => handle_loading_animation(false, "")}
                   >
                     <div
                       className={`absolute inset-0 z-10 h-full w-full transition-transform duration-300 ${
                         isLoading &&
-                        article.title +
-                          article.href +
-                          article.createdAt.toISOString() ===
-                          isLoading_button
+                        article.href_title_date === isLoading_button
                           ? "translate-x-0 transform bg-red-700"
                           : "-translate-x-full transform"
                       }`}
@@ -191,11 +183,7 @@ export default function Component() {
                     {/* {currentArticle} */}
 
                     <div className="relative z-10">
-                      {isLoading &&
-                      article.title +
-                        article.href +
-                        article.createdAt.toISOString() ===
-                        isLoading_button
+                      {isLoading && article.href_title_date === isLoading_button
                         ? "PENETRATING MEGACORPORATION FIREWALL"
                         : "Read Full Article"}
                       {/* <ChevronRight className="ml-2 h-4 w-4" /> */}
