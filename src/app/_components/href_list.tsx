@@ -6,9 +6,7 @@ import Link from "next/link";
 const HrefLinks: React.FC<HrefLinksProps> = ({ href_links }) => {
   return (
     <div className="href-links-container rounded-lg bg-gray-900 p-4 text-red-500 shadow-lg">
-      <h3 className="mb-4 text-xl font-bold text-white">
-        Related Links that the program caught
-      </h3>
+      <h3 className="mb-4 text-xl font-bold text-white">Related Links</h3>
       <ul className="space-y-2">
         {href_links.map((href, index) => (
           <li key={index} className="group">
