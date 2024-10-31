@@ -1,9 +1,7 @@
 import { relations, sql } from "drizzle-orm";
 import {
   boolean,
-  // index,
   integer,
-  jsonb,
   pgTableCreator,
   primaryKey,
   serial,
@@ -11,89 +9,56 @@ import {
   timestamp,
   uuid,
   varchar,
-  PgArray,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 
-/**
- * This is an example of how to  use the multi-project schema feature of Drizzle ORM. Use the same
- * database instance for multiple projects.
- *
- * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
- */
 export const createTable = pgTableCreator((name) => `vtsns-cyberpunk_${name}`);
 
 export const jobRuns = createTable("job_runs", {
   runDate: timestamp("runDate", { withTimezone: true }).primaryKey().notNull(),
 });
 
-export const article = createTable(
-  "article",
-  {
-    id: uuid("id")
-      .primaryKey()
-      .default(sql`gen_random_uuid()`), // Use default UUID generation
-    title: varchar("title", { length: 1000 }).notNull(),
-    subject: varchar("subject", { length: 1000 }).notNull(),
-    href: varchar("href", { length: 1500 }).notNull().unique(),
-    href_title_date: varchar("href_title_date", { length: 1500 })
-      .notNull()
-      .unique(),
-    text: text("content").notNull(), // Large text field for the essay content
-    href_links: varchar("href_links", { length: 1000 })
-      .array()
-      .notNull()
-      .default(sql`'{}'::text[]`), // roles:  array(varchar('role', { length: 50 })) // Defining an array of strings (roles)
-
-    createdAt: timestamp("created_at", { withTimezone: true })
-      // .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-      () => new Date(),
-    ),
-    isSpecial_announcement: boolean("isSpecial_announcement").notNull(),
-  },
-  // (example) => ({
-  //   href_title_date_idx: index("href_title_date_idx").on(
-  //     example.href_title_date,
-  //   ),
-  // }),
-);
+export const article = createTable("article", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  title: varchar("title", { length: 1000 }).notNull(),
+  subject: varchar("subject", { length: 1000 }).notNull(),
+  href: varchar("href", { length: 1500 }).notNull().unique(),
+  href_title_date: varchar("href_title_date", { length: 1500 })
+    .notNull()
+    .unique(),
+  text: text("content").notNull(),
+  href_links: varchar("href_links", { length: 1000 })
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+    () => new Date(),
+  ),
+  isSpecial_announcement: boolean("isSpecial_announcement").notNull(),
+});
 export type article_type = typeof article.$inferSelect;
 
 export const subject = createTable("subject", {
-  id: serial("id").primaryKey(), // Auto-incrementing primary key for hrefs
+  id: serial("id").primaryKey(),
   name: varchar("name", { length: 1000 }).notNull().unique(),
 });
 
-// export const articleHref = createTable("article_href", {
-//   id: serial("id").primaryKey(), // Auto-incrementing primary key for hrefs
-//   articleId: uuid("article_id")
-//     .notNull()
-//     .references(() => article.id, { onDelete: "cascade" }), // Foreign key to the article table
-//   href: varchar("href", { length: 1000 }).notNull(), // Store individual hrefs
-// });
-
-export const posts = createTable(
-  "post",
-  {
-    id: serial("id").primaryKey(),
-    name: varchar("name", { length: 256 }),
-    createdById: varchar("created_by", { length: 255 })
-      .notNull()
-      .references(() => users.id),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-      () => new Date(),
-    ),
-  },
-  // (example) => ({
-  //   createdByIdIdx: index("created_by_idx").on(example.createdById),
-  //   nameIndex: index("name_idx").on(example.name),
-  // }),
-);
+export const posts = createTable("post", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 256 }),
+  createdById: varchar("created_by", { length: 255 })
+    .notNull()
+    .references(() => users.id),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+    () => new Date(),
+  ),
+});
 
 export const users = createTable("user", {
   id: varchar("id", { length: 255 })
@@ -113,57 +78,42 @@ export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
 }));
 
-export const accounts = createTable(
-  "account",
-  {
-    userId: varchar("user_id", { length: 255 })
-      .notNull()
-      .references(() => users.id),
-    type: varchar("type", { length: 255 })
-      .$type<AdapterAccount["type"]>()
-      .notNull(),
-    provider: varchar("provider", { length: 255 }).notNull(),
-    providerAccountId: varchar("provider_account_id", {
-      length: 255,
-    }).notNull(),
-    refresh_token: text("refresh_token"),
-    access_token: text("access_token"),
-    expires_at: integer("expires_at"),
-    token_type: varchar("token_type", { length: 255 }),
-    scope: varchar("scope", { length: 255 }),
-    id_token: text("id_token"),
-    session_state: varchar("session_state", { length: 255 }),
-  },
-  // (account) => ({
-  //   compoundKey: primaryKey({
-  //     columns: [account.provider, account.providerAccountId],
-  //   }),
-  //   userIdIdx: index("account_user_id_idx").on(account.userId),
-  // }),
-);
+export const accounts = createTable("account", {
+  userId: varchar("user_id", { length: 255 })
+    .notNull()
+    .references(() => users.id),
+  type: varchar("type", { length: 255 })
+    .$type<AdapterAccount["type"]>()
+    .notNull(),
+  provider: varchar("provider", { length: 255 }).notNull(),
+  providerAccountId: varchar("provider_account_id", {
+    length: 255,
+  }).notNull(),
+  refresh_token: text("refresh_token"),
+  access_token: text("access_token"),
+  expires_at: integer("expires_at"),
+  token_type: varchar("token_type", { length: 255 }),
+  scope: varchar("scope", { length: 255 }),
+  id_token: text("id_token"),
+  session_state: varchar("session_state", { length: 255 }),
+});
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
   user: one(users, { fields: [accounts.userId], references: [users.id] }),
 }));
 
-export const sessions = createTable(
-  "session",
-  {
-    sessionToken: varchar("session_token", { length: 255 })
-      .notNull()
-      .primaryKey(),
-    userId: varchar("user_id", { length: 255 })
-      .notNull()
-      .references(() => users.id),
-    expires: timestamp("expires", {
-      mode: "date",
-      withTimezone: true,
-    }).notNull(),
-  },
-  // (session) => ({
-  //   userIdIdx: index("session_user_id_idx").on(session.userId),
-  // }),
-);
+export const sessions = createTable("session", {
+  sessionToken: varchar("session_token", { length: 255 })
+    .notNull()
+    .primaryKey(),
+  userId: varchar("user_id", { length: 255 })
+    .notNull()
+    .references(() => users.id),
+  expires: timestamp("expires", {
+    mode: "date",
+    withTimezone: true,
+  }).notNull(),
+});
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, { fields: [sessions.userId], references: [users.id] }),

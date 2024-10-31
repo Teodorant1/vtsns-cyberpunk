@@ -11,18 +11,14 @@ import {
 import { addDays, format, isWithinInterval, parseISO, subDays } from "date-fns";
 import { type DateRange } from "react-day-picker";
 import PaginatedList from "./_components/PaginatedList";
-// import Testbutton from "./_components/testbutton";
-// import AudioPlayer from "./_components/audioPlayer";
 import { api } from "~/trpc/react";
 import HrefLinks from "./_components/href_list";
-// import Link from "next/link";
 
 export default function Component() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: subDays(new Date(), 7),
     to: addDays(new Date(), 3),
   });
-  // const [category, setCategory] = useState<string>("all");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoading_button, setIsLoading_button] = useState("");
   const [currentcategory, setcurrentcategory] = useState("All");
@@ -137,7 +133,6 @@ export default function Component() {
                 <h3 className="glitch mb-2 text-2xl font-semibold text-white">
                   {article.subject} - {article.title}
                 </h3>
-                {/* <p className="mb-4 text-red-300">{article.excerpt}</p> */}
                 <div className="mb-4 flex items-center space-x-4">
                   <div className="flex items-center">
                     <div className="mb-4 flex items-center justify-between text-sm text-red-400">
@@ -160,7 +155,6 @@ export default function Component() {
                   <button
                     onClick={() => {
                       setcurrentArticle(article.href_title_date);
-                      //  console.log("bla bla bla");
                     }}
                     className={`read-article-button relative w-full overflow-hidden bg-red-600 py-2 text-white transition-colors duration-300`}
                     onMouseEnter={() =>
@@ -179,14 +173,10 @@ export default function Component() {
                         transition: "transform 1s ease-in-out",
                       }}
                     />
-
-                    {/* {currentArticle} */}
-
                     <div className="relative z-10">
                       {isLoading && article.href_title_date === isLoading_button
                         ? "PENETRATING MEGACORPORATION FIREWALL"
                         : "Read Full Article"}
-                      {/* <ChevronRight className="ml-2 h-4 w-4" /> */}
                     </div>
                   </button>
                 )}

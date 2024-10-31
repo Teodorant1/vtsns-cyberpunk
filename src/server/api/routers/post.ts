@@ -1,17 +1,12 @@
 import { z } from "zod";
 import { addDays } from "date-fns";
-
 import {
   createTRPCRouter,
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
 import { posts } from "~/server/db/schema";
-import {
-  // scrape_vtsns_article,
-  // scrape_Predmeti_info,
-  scrape_vtsns_CRONJOB,
-} from "~/utilities/random-functions";
+import { scrape_vtsns_CRONJOB } from "~/utilities/random-functions";
 
 export const postRouter = createTRPCRouter({
   getLatest_articles: publicProcedure
@@ -61,19 +56,9 @@ export const postRouter = createTRPCRouter({
     return subjects ?? [];
   }),
 
-  test_web_scraper: publicProcedure.mutation(async ({ ctx, input }) => {
+  test_web_scraper: protectedProcedure.mutation(async ({ ctx, input }) => {
     const value0 = await scrape_vtsns_CRONJOB();
-    // const value1 = await scrape_Predmeti_info();
-    // const value2 = await scrape_vtsns_article(
-    //   "https://vtsns.edu.rs/predmeti-info/prof-petra-balaban-otkazivanje-nastave/",
-    // );
-
-    // await ctx.db.insert(posts).values({
-    //   name: input.name,
-    //   createdById: ctx.session.user.id,
-    // });
     return value0;
-    // return { value1, value2 };
   }),
 
   hello: publicProcedure
