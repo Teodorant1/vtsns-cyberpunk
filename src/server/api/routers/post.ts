@@ -7,6 +7,7 @@ import {
 } from "~/server/api/trpc";
 import { posts } from "~/server/db/schema";
 import { scrape_vtsns_CRONJOB } from "~/utilities/random-functions";
+import { Name } from "drizzle-orm";
 
 export const postRouter = createTRPCRouter({
   getLatest_articles: publicProcedure
@@ -53,7 +54,10 @@ export const postRouter = createTRPCRouter({
     console.log("getting subjects");
 
     const subjects = await ctx.db.query.subject.findMany({});
-    return subjects ?? [];
+
+    const subjects_with_all = [{ name: "All", id: -1 }, ...subjects];
+
+    return subjects_with_all ?? [];
   }),
 
   test_web_scraper: protectedProcedure.mutation(async ({ ctx, input }) => {

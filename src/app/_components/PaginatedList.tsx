@@ -30,8 +30,8 @@ const PaginatedList: React.FC<PaginatedListProps> = ({
     <div className="mb-6 flex flex-wrap gap-3">
       <div>
         <div>
-          Total Available Subjects: {categories.length} , Current Page:{" "}
-          {currentPage + 1}
+          Subjects : {categories.length} , Number of pages:{" "}
+          {Math.ceil(categories.length / 10)} , Current Page: {currentPage + 1}
         </div>
         <button
           className="m-5"
@@ -56,7 +56,7 @@ const PaginatedList: React.FC<PaginatedListProps> = ({
             onClick={() => onToggleCategory(cat.name)}
             className={`button-hover mx-2 my-1 ${
               currentCategory === cat.name ? "bg-red-600" : "bg-gray-800"
-            } text-white hover:bg-red-700`}
+            } truncate text-white hover:bg-red-700`}
           >
             {cat.name}
           </Button>
