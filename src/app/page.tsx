@@ -58,7 +58,7 @@ export default function Component() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-red-500">
+    <div className="bg-black text-red-500">
       <div className="scanline"></div>
 
       <main className="container mx-auto py-8">
