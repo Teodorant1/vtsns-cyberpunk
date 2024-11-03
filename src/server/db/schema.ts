@@ -38,6 +38,9 @@ export const article = createTable("article", {
     () => new Date(),
   ),
   isSpecial_announcement: boolean("isSpecial_announcement").notNull(),
+  has_been_announced_in_discord: boolean(
+    "has_been_announced_in_discord",
+  ).default(false),
 });
 export type article_type = typeof article.$inferSelect;
 

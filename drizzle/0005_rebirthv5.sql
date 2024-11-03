@@ -1,0 +1,1 @@
+ALTER TABLE "vtsns-cyberpunk_article" ADD COLUMN "has_been_announced_in_discord" boolean DEFAULT false;

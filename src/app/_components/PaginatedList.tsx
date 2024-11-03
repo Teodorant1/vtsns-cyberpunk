@@ -56,7 +56,7 @@ const PaginatedList: React.FC<PaginatedListProps> = ({
             onClick={() => onToggleCategory(cat.name)}
             className={`button-hover mx-2 my-1 ${
               currentCategory === cat.name ? "bg-red-600" : "bg-gray-800"
-            } truncate text-white hover:bg-red-700`}
+            } w-64 justify-start truncate text-white hover:bg-red-700`}
           >
             {cat.name}
           </Button>
