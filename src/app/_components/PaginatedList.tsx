@@ -72,14 +72,14 @@ const PaginatedList: React.FC<PaginatedListProps> = ({
           Page: {currentPage + 1}
         </div> */}
         <button
-          className="m-2 p-2 outline outline-red-400"
+          className="m-2 p-2 outline outline-red-800"
           onClick={handlePrevious}
           disabled={currentPage === 0}
         >
           Previous
         </button>
         <button
-          className="m-2 p-2 outline outline-red-400"
+          className="m-2 p-2 outline outline-red-800"
           onClick={handleNext}
           disabled={currentPage >= totalPages - 1}
         >
