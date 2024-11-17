@@ -7,7 +7,6 @@ import {
 } from "~/server/api/trpc";
 import { posts } from "~/server/db/schema";
 import { scrape_vtsns_CRONJOB } from "~/utilities/random-functions";
-import { Name } from "drizzle-orm";
 
 export const postRouter = createTRPCRouter({
   getLatest_articles: publicProcedure

@@ -49,6 +49,11 @@ export const subject = createTable("subject", {
   name: varchar("name", { length: 1000 }).notNull().unique(),
 });
 
+export const error_tester = createTable("error_tester", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 1000 }).notNull().unique(),
+});
+
 export const posts = createTable("post", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 256 }),
