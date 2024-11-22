@@ -1,2 +1,0 @@
-ALTER TABLE "vtsns-cyberpunk_article" ADD COLUMN "href" varchar(1500) NOT NULL;--> statement-breakpoint
-ALTER TABLE "vtsns-cyberpunk_article" ADD CONSTRAINT "vtsns-cyberpunk_article_href_unique" UNIQUE("href");

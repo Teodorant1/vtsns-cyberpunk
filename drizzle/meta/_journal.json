@@ -5,50 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1730050079928,
-      "tag": "0000_rebirthv0",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1730059141180,
-      "tag": "0001_rebirthv1",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1730209587768,
-      "tag": "0002_rebirthv2",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1730209857749,
-      "tag": "0003_rebirthv3",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1730210006305,
-      "tag": "0004_rebirthv4",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1730625865717,
-      "tag": "0005_rebirthv5",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1731620333896,
-      "tag": "0006_rebirthv6",
+      "when": 1732302753460,
+      "tag": "0000_rebirthv1",
       "breakpoints": true
     }
   ]

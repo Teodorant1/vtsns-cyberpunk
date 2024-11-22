@@ -1,5 +1,5 @@
 {
-  "id": "b2a822af-bdb3-4f9c-9fea-5e992b9b7f5d",
+  "id": "e1f44763-7263-45e9-82d1-06988951972c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -117,6 +117,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "href": {
+          "name": "href",
+          "type": "varchar(1500)",
+          "primaryKey": false,
+          "notNull": true
+        },
         "href_title_date": {
           "name": "href_title_date",
           "type": "varchar(1500)",
@@ -129,12 +135,12 @@
           "primaryKey": false,
           "notNull": true
         },
-        "hrefs": {
-          "name": "hrefs",
-          "type": "jsonb",
+        "href_links": {
+          "name": "href_links",
+          "type": "varchar(1000)[]",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'[]'"
+          "notNull": true,
+          "default": "'{}'::text[]"
         },
         "created_at": {
           "name": "created_at",
@@ -153,17 +159,61 @@
           "type": "boolean",
           "primaryKey": false,
           "notNull": true
+        },
+        "has_been_announced_in_discord": {
+          "name": "has_been_announced_in_discord",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
+        "vtsns-cyberpunk_article_href_unique": {
+          "name": "vtsns-cyberpunk_article_href_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "href"
+          ]
+        },
         "vtsns-cyberpunk_article_href_title_date_unique": {
           "name": "vtsns-cyberpunk_article_href_title_date_unique",
           "nullsNotDistinct": false,
           "columns": [
             "href_title_date"
+          ]
+        }
+      }
+    },
+    "public.vtsns-cyberpunk_error_tester": {
+      "name": "vtsns-cyberpunk_error_tester",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(1000)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "vtsns-cyberpunk_error_tester_name_unique": {
+          "name": "vtsns-cyberpunk_error_tester_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name"
           ]
         }
       }
@@ -281,8 +331,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.vtsns-cyberpunk_article_href": {
-      "name": "vtsns-cyberpunk_article_href",
+    "public.vtsns-cyberpunk_subject": {
+      "name": "vtsns-cyberpunk_subject",
       "schema": "",
       "columns": {
         "id": {
@@ -302,8 +352,8 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "vtsns-cyberpunk_article_href_name_unique": {
-          "name": "vtsns-cyberpunk_article_href_name_unique",
+        "vtsns-cyberpunk_subject_name_unique": {
+          "name": "vtsns-cyberpunk_subject_name_unique",
           "nullsNotDistinct": false,
           "columns": [
             "name"

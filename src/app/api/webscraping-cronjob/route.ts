@@ -11,6 +11,8 @@ export async function POST(request: Request) {
   try {
     const should_run_cron = await shouldRunJob();
     if (should_run_cron === true) {
+      // we might need this to debug later
+      // if (1 > 0) {
       await scrape_vtsns_CRONJOB();
 
       const currentTime = new Date();
@@ -26,6 +28,7 @@ export async function POST(request: Request) {
       Skipped: true,
     });
   } catch (error) {
+    console.log("error", error);
     return NextResponse.json(
       { message: "Failed to process data", error: (error as Error).message },
       { status: 400 },

@@ -1,1 +1,0 @@
-ALTER TABLE "vtsns-cyberpunk_article" ALTER COLUMN "href_links" SET DATA TYPE varchar(1000)[];
