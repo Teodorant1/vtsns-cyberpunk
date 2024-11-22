@@ -8,6 +8,13 @@
       "when": 1732302753460,
       "tag": "0000_rebirthv1",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1732306599581,
+      "tag": "0001_rebirthv2",
+      "breakpoints": true
     }
   ]
 }

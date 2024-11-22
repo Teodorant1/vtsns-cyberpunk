@@ -185,7 +185,7 @@ async function upsertArticle(
       href: href_url,
     })
     .onConflictDoUpdate({
-      target: [article.href_title_date, article.href], // Targeting both columns
+      target: [article.href_title_date], // Targeting both columns
       set: {
         title: title,
         subject: subject,

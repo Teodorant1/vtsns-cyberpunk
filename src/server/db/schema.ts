@@ -24,7 +24,7 @@ export const article = createTable("article", {
     .default(sql`gen_random_uuid()`),
   title: varchar("title", { length: 1000 }).notNull(),
   subject: varchar("subject", { length: 1000 }).notNull(),
-  href: varchar("href", { length: 1500 }).notNull().unique(),
+  href: varchar("href", { length: 1500 }).notNull(),
   href_title_date: varchar("href_title_date", { length: 1500 })
     .notNull()
     .unique(),

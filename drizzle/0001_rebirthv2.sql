@@ -1,0 +1,1 @@
+ALTER TABLE "vtsns-cyberpunk_article" DROP CONSTRAINT "vtsns-cyberpunk_article_href_unique";
