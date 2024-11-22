@@ -189,12 +189,10 @@ async function upsertArticle(
       set: {
         title: title,
         subject: subject,
-        href_title_date: href_title_date,
         text: text,
         href_links: hrefs ?? [],
         createdAt: Date,
         isSpecial_announcement: isSpecial_announcement,
-        href: href_url,
       },
     });
 }
