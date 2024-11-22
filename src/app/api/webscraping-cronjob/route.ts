@@ -30,7 +30,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.log("error", error);
     return NextResponse.json(
-      { message: "Failed to process data", error: (error as Error).message },
+      { message: "Failed to process data", error: error as Error },
       { status: 400 },
     );
   }
