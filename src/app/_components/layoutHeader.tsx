@@ -5,14 +5,17 @@ const LayoutHeader = () => {
   return (
     <div>
       <div className="flex border-b border-red-800 bg-black p-4">
+        <div>
+          <img src="/image00001.png" alt="vtsns-logo" />
+        </div>
         <div className="container mx-auto flex">
-          <h1
+          {/* <h1
             className="glitch flex text-2xl font-bold tracking-wider text-red-600"
             style={{ textShadow: "2px 2px 4px rgba(255,0,0,0.5)" }}
           >
             VTSNS
             <div className="text-white">-Cyberpunk </div>
-          </h1>
+          </h1> */}
 
           <div className="flex w-fit items-center justify-between text-2xl text-white">
             {" "}

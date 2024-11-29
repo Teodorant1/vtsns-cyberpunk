@@ -63,7 +63,7 @@ export default function Component() {
 
       <main className="container mx-auto py-8">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="glitch flex text-3xl font-bold text-white">
+          {/* <h2 className="glitch flex text-3xl font-bold text-white">
             Breaking News{" "}
             <div
               className="glitch text-2xl font-bold tracking-wider text-red-600"
@@ -71,7 +71,7 @@ export default function Component() {
             >
               VTSNS NETRUNNERS
             </div>
-          </h2>
+          </h2> */}
         </div>
         {categories.data ? (
           <div>
