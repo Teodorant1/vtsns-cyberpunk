@@ -1,12 +1,18 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const LayoutHeader = () => {
   return (
     <div>
       <div className="flex border-b border-red-800 bg-black p-4">
         <div>
-          <img src="/image00001.png" alt="vtsns-logo" />
+          <Image
+            src="/image00001.png"
+            width={300}
+            height={300}
+            alt="vtsns-logo"
+          />
         </div>
         <div className="container mx-auto flex">
           {/* <h1
