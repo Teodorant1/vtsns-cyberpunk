@@ -59,10 +59,10 @@ export const postRouter = createTRPCRouter({
     return subjects_with_all ?? [];
   }),
 
-  test_web_scraper: protectedProcedure.mutation(async ({ ctx, input }) => {
-    const value0 = await scrape_vtsns_CRONJOB();
-    return value0;
-  }),
+  // test_web_scraper: protectedProcedure.mutation(async ({ ctx, input }) => {
+  //   const value0 = await scrape_vtsns_CRONJOB();
+  //   return value0;
+  // }),
 
   hello: publicProcedure
     .input(z.object({ text: z.string() }))
