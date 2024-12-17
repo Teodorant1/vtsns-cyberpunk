@@ -5,8 +5,9 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { posts } from "~/server/db/schema";
-import { scrape_vtsns_CRONJOB } from "~/utilities/random-functions";
+import { article, posts } from "~/server/db/schema";
+import { and, eq, gte, lte } from "drizzle-orm";
+// import { scrape_vtsns_CRONJOB } from "~/utilities/random-functions";
 
 export const postRouter = createTRPCRouter({
   getLatest_articles: publicProcedure
@@ -25,10 +26,10 @@ export const postRouter = createTRPCRouter({
         if (input.subject !== "All") {
           {
             const latestArticles2 = await ctx.db.query.article.findMany({
-              where: (articles, { eq, gte, lte }) =>
-                eq(articles.subject, input.subject) &&
-                gte(articles.createdAt, input.from!) &&
-                lte(articles.createdAt, input_to),
+              where: and(
+                gte(article.createdAt, input.from),
+                lte(article.createdAt, input_to),
+              ),
               orderBy: (articles, { desc }) => [desc(articles.createdAt)],
               limit: 50,
             });
@@ -37,10 +38,11 @@ export const postRouter = createTRPCRouter({
           }
         } else if (input.subject === "All") {
           const latestArticles3 = await ctx.db.query.article.findMany({
-            where: (articles, { eq, gte, lte }) =>
-              eq(articles.subject, input.subject) &&
-              gte(articles.createdAt, input.from!) &&
-              lte(articles.createdAt, input_to),
+            where: and(
+              gte(article.createdAt, input.from),
+              lte(article.createdAt, input_to),
+            ),
+
             orderBy: (articles, { desc }) => [desc(articles.createdAt)],
             limit: 50,
           });
