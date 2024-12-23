@@ -20,7 +20,7 @@ export const postRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       if (input.from && input.to) {
-        const input_to = addDays(input.to, 2);
+        const input_to = addDays(input.to, 1);
         console.log("getting latest articles");
 
         if (input.subject !== "All") {
