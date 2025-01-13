@@ -6,7 +6,7 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import { article, posts } from "~/server/db/schema";
-import { and, eq, gte, lte } from "drizzle-orm";
+import { and, gte, lte } from "drizzle-orm";
 // import { scrape_vtsns_CRONJOB } from "~/utilities/random-functions";
 
 export const postRouter = createTRPCRouter({

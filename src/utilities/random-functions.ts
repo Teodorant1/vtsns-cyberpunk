@@ -7,7 +7,13 @@ import got from "got";
 import { load } from "cheerio";
 import { type PostData } from "~/project-types";
 import { db } from "~/server/db";
-import { article, jobRuns, subject } from "~/server/db/schema";
+import {
+  article,
+  // type article_type,
+  jobRuns,
+  subject,
+} from "~/server/db/schema";
+// import HrefLinks from "~/app/_components/href_list";
 
 export async function scrape_Predmeti_info() {
   const { body } = await got("https://vtsns.edu.rs/predmeti-info/");
@@ -40,7 +46,40 @@ export async function scrape_Predmeti_info() {
   });
 
   const postsDataResolved = await Promise.all(postPromises);
-  return postsDataResolved;
+
+  const refinedPosts: {
+    text: string;
+    href: string;
+    title: string;
+    href_title_date: string;
+    subject: string;
+    href_links: string[];
+    createdAt: Date;
+    updatedAt: Date | null;
+    isSpecial_announcement: boolean;
+    has_been_announced_in_discord: boolean | null;
+  }[] = [];
+  console.log(refinedPosts);
+  for (let i = 0; i < postsDataResolved.length; i++) {
+    const article = {
+      text: postsDataResolved[i]?.article.combinedText ?? "",
+      href: postsDataResolved[i]?.href ?? "",
+      title: postsDataResolved[i]?.title ?? "",
+      href_title_date: postsDataResolved[i]?.href_title_date ?? "",
+      subject: postsDataResolved[i]?.title_analysis.subject ?? "",
+      href_links: postsDataResolved[i]?.article.hrefLinks ?? [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      isSpecial_announcement:
+        postsDataResolved[i]?.title_analysis.is_general_announcement ?? false,
+      has_been_announced_in_discord: false,
+    };
+    refinedPosts.push(article);
+  }
+
+  // return postsDataResolved;
+
+  return refinedPosts;
 }
 
 export async function scrape_vtsns_article(url: string) {
@@ -125,74 +164,81 @@ export async function shouldRunJob() {
 
 export async function scrape_vtsns_CRONJOB() {
   const article_page = await scrape_Predmeti_info();
-  for (let i = 0; i < article_page.length; i++) {
-    const new_hreflinks = [
-      ...article_page[i]!.article.hrefLinks,
-      article_page[i]!.href,
-    ];
+  await upsertArticle(article_page);
+  //  for (let i = 0; i < article_page.length; i++) {
+  //   const new_hreflinks = [
+  //     ...article_page[i]!.article.hrefLinks,
+  //     article_page[i]!.href,
+  //   ];
 
-    await upsertArticle(
-      article_page[i]!.title_analysis.title,
-      article_page[i]!.title_analysis.subject,
-      article_page[i]!.href_title_date,
-      article_page[i]!.article.combinedText,
-      article_page[i]!.title_analysis.is_general_announcement,
-      article_page[i]!.date!,
-      article_page[i]!.href,
-      new_hreflinks ?? [],
-    );
-    if (article_page[i]!.title_analysis.is_general_announcement === false) {
-      await upsertSubject(article_page[i]!.title_analysis.subject);
-    }
-  }
+  //   await upsertArticle(
+  //     article_page[i]!.title_analysis.title,
+  //     article_page[i]!.title_analysis.subject,
+  //     article_page[i]!.href_title_date,
+  //     article_page[i]!.article.combinedText,
+  //     article_page[i]!.title_analysis.is_general_announcement,
+  //     article_page[i]!.date!,
+  //     article_page[i]!.href,
+  //     new_hreflinks ?? [],
+  //   );.title_analysis.is_general_announcement === false
+  // if (article_page[i]!.title. === false) {
+  await upsertSubject(article_page);
+  //  }
+  // }
 }
 
-async function upsertSubject(name: string) {
-  await db
-    .insert(subject)
-    .values({
-      name: name,
-    })
-    .onConflictDoUpdate({
-      target: [subject.name],
-      set: {
-        name: name,
-      },
-    });
+async function upsertSubject(
+  refinedPosts: {
+    text: string;
+    href: string;
+    title: string;
+    href_title_date: string;
+    subject: string;
+    href_links: string[];
+    createdAt: Date;
+    updatedAt: Date | null;
+    isSpecial_announcement: boolean;
+    has_been_announced_in_discord: boolean | null;
+  }[],
+) {
+  const subjects: { name: string }[] = [];
+  for (let i = 0; i < refinedPosts.length; i++) {
+    subjects.push({ name: refinedPosts[i]?.subject ?? "" });
+  }
+
+  await db.insert(subject).values(subjects).onConflictDoNothing();
+  // .onConflictDoUpdate({
+  //   target: [subject.name],
+  //   set: {
+  //     name: subject.name,
+  //   },
+  // })
+  // .returning();
 }
 
 async function upsertArticle(
-  title: string,
-  subject: string,
-  href_title_date: string,
-  text: string,
-  isSpecial_announcement: boolean,
-  Date: Date,
-  href_url: string,
-  hrefs?: string[],
+  refinedPosts: {
+    text: string;
+    href: string;
+    title: string;
+    href_title_date: string;
+    subject: string;
+    href_links: string[];
+    createdAt: Date;
+    updatedAt: Date | null;
+    isSpecial_announcement: boolean;
+    has_been_announced_in_discord: boolean | null;
+  }[],
 ) {
   await db
     .insert(article)
-    .values({
-      title: title,
-      subject: subject,
-      href_title_date: href_title_date,
-      text: text,
-      href_links: hrefs ?? [],
-      createdAt: Date,
-      updatedAt: Date,
-      isSpecial_announcement: isSpecial_announcement,
-      href: href_url,
-    })
+    .values(refinedPosts)
+    //  .onConflictDoNothing();
     .onConflictDoUpdate({
-      target: [article.href_title_date], // Targeting both columns
+      target: [article.href_title_date],
       set: {
-        title: title,
-        subject: subject,
-        text: text,
-        href_links: hrefs ?? [],
-        createdAt: Date,
-        isSpecial_announcement: isSpecial_announcement,
+        href_links: sql`${article.href_links}`, // Use SQL helper to reference the column properly
+        text: sql`${article.text}`, // Use SQL helper to reference the column properly
       },
     });
 }

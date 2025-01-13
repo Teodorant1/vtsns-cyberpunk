@@ -62,17 +62,7 @@ export default function Component() {
       <div className="scanline"></div>
 
       <main className="container mx-auto py-8">
-        <div className="mb-6 flex items-center justify-between">
-          {/* <h2 className="glitch flex text-3xl font-bold text-white">
-            Breaking News{" "}
-            <div
-              className="glitch text-2xl font-bold tracking-wider text-red-600"
-              style={{ textShadow: "2px 2px 4px rgba(255,0,0,0.5)" }}
-            >
-              VTSNS NETRUNNERS
-            </div>
-          </h2> */}
-        </div>
+        <div className="mb-6 flex items-center justify-between"></div>
         {categories.data ? (
           <div>
             <PaginatedList
