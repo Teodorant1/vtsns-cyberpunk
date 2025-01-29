@@ -16,7 +16,8 @@ import HrefLinks from "./_components/href_list";
 
 export default function Component() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: subDays(new Date(), 7),
+    from: new Date(Date.UTC(2024, 8, 1)),
+    // from: subDays(new Date(), 7),
     to: addDays(new Date(), 3),
   });
   const [isLoading, setIsLoading] = useState(false);
