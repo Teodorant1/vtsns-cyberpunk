@@ -135,11 +135,11 @@ export default function Component() {
                 {currentArticle === article.href_title_date && (
                   <div className="mb-4 items-center justify-between text-sm text-red-400">
                     <p>{article.text}</p>
-                    <p>
+                    <div>
                       {article.href_links && article.href_links.length > 0 && (
                         <HrefLinks href_links={article.href_links} />
                       )}{" "}
-                    </p>
+                    </div>
                   </div>
                 )}{" "}
                 {currentArticle !== article.href_title_date && (
