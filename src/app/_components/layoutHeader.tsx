@@ -1,48 +1,77 @@
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { Menu, X } from "lucide-react"; // For hamburger and close icons
 
 const LayoutHeader = () => {
-  return (
-    <div>
-      <div className="flex border-b border-red-800 bg-black p-4">
-        <div>
-          <Image
-            src="/image00001.png"
-            width={300}
-            height={300}
-            alt="vtsns-logo"
-          />
-        </div>
-        <div className="container mx-auto flex">
-          {/* <h1
-            className="glitch flex text-2xl font-bold tracking-wider text-red-600"
-            style={{ textShadow: "2px 2px 4px rgba(255,0,0,0.5)" }}
-          >
-            VTSNS
-            <div className="text-white">-Cyberpunk </div>
-          </h1> */}
+  const [isOpen, setIsOpen] = useState(false);
 
-          <div className="flex w-fit items-center justify-between text-2xl text-white">
-            {" "}
-            <Link href="/" className="mx-5 hover:text-red-400">
-              <h1 className="font-bold">Headlines</h1>
-            </Link>
-            <Link href="/FAQ" className="m-5 hover:text-red-400">
-              <h1 className="font-bold">FAQ</h1>
-            </Link>
-            <Link
-              href="https://discord.gg/KAnnz5bNRq"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="m-5 hover:text-red-400"
-            >
-              <h1 className="font-bold">Discord</h1>
-            </Link>
-          </div>
-        </div>
+  return (
+    <header className="border-b border-red-800 bg-black p-4">
+      <div className="flex items-center justify-between">
+        <Image
+          src="/image00001.png"
+          width={150}
+          height={150}
+          alt="vtsns-logo"
+        />
+
+        {/* Mobile Menu Toggle */}
+        <button
+          className="text-white focus:outline-none md:hidden"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {isOpen ? <X size={32} /> : <Menu size={32} />}
+        </button>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden space-x-6 text-2xl text-white md:flex">
+          <Link href="/" className="font-bold hover:text-red-400">
+            Headlines
+          </Link>
+          <Link href="/FAQ" className="font-bold hover:text-red-400">
+            FAQ
+          </Link>
+          <Link
+            href="https://discord.gg/KAnnz5bNRq"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-bold hover:text-red-400"
+          >
+            Discord
+          </Link>
+        </nav>
       </div>
-    </div>
+
+      {/* Mobile Navigation */}
+      {isOpen && (
+        <nav className="mt-4 flex flex-col space-y-4 text-center text-2xl text-white md:hidden">
+          <Link
+            href="/"
+            className="font-bold hover:text-red-400"
+            onClick={() => setIsOpen(false)}
+          >
+            Headlines
+          </Link>
+          <Link
+            href="/FAQ"
+            className="font-bold hover:text-red-400"
+            onClick={() => setIsOpen(false)}
+          >
+            FAQ
+          </Link>
+          <Link
+            href="https://discord.gg/KAnnz5bNRq"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-bold hover:text-red-400"
+            onClick={() => setIsOpen(false)}
+          >
+            Discord
+          </Link>
+        </nav>
+      )}
+    </header>
   );
 };
 
