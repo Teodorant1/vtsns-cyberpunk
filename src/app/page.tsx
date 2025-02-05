@@ -8,7 +8,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
-import { addDays, format, isWithinInterval, parseISO, subDays } from "date-fns";
+import { addDays, format, isWithinInterval, parseISO } from "date-fns";
 import { type DateRange } from "react-day-picker";
 import PaginatedList from "./_components/PaginatedList";
 import { api } from "~/trpc/react";
@@ -17,7 +17,6 @@ import HrefLinks from "./_components/href_list";
 export default function Component() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(Date.UTC(2024, 8, 1)),
-    // from: subDays(new Date(), 7),
     to: addDays(new Date(), 3),
   });
   const [isLoading, setIsLoading] = useState(false);

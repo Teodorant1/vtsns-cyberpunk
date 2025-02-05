@@ -27,7 +27,7 @@ const LayoutHeader = () => {
         </button>
 
         {/* Desktop Navigation */}
-        <nav className="hidden space-x-6 text-2xl text-white md:flex">
+        <nav className="hidden space-x-6 text-2xl text-white md:mr-[20%] md:flex">
           <Link href="/" className="font-bold hover:text-red-400">
             Headlines
           </Link>
