@@ -129,10 +129,13 @@ export default function Component() {
               />
             </PopoverContent>
             <div>
-              <div>
-                IMPORTANT INFO! THE APP DOESN{"'"}T USE YOUR TIMEZONE AND
-                INSTEAD DEFAULTS TO UTC
-              </div>
+              {dates.data?.currentDate && (
+                <div>
+                  IMPORTANT INFO! THE APP DOESN{"'"}T USE YOUR TIMEZONE AND
+                  INSTEAD DEFAULTS TO UTC
+                </div>
+              )}
+
               {dates.data?.currentDate && (
                 <div>Current Date: {dates.data?.currentDate.toISOString()}</div>
               )}
