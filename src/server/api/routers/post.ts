@@ -5,8 +5,8 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { article, posts } from "~/server/db/schema";
-import { and, gte, lte } from "drizzle-orm";
+import { article, jobRuns, posts } from "~/server/db/schema";
+import { and, desc, gte, lte } from "drizzle-orm";
 // import { scrape_vtsns_CRONJOB } from "~/utilities/random-functions";
 
 export const postRouter = createTRPCRouter({
@@ -59,6 +59,21 @@ export const postRouter = createTRPCRouter({
     const subjects_with_all = [{ name: "All", id: -1 }, ...subjects];
 
     return subjects_with_all ?? [];
+  }),
+
+  get_latest_date_of_Cronjob: publicProcedure.query(async ({ ctx }) => {
+    console.log("getting dates");
+
+    const currentDate = new Date();
+
+    const latestRun = await ctx.db.query.jobRuns.findFirst({
+      orderBy: [desc(jobRuns.runDate)],
+    });
+
+    return {
+      currentDate: currentDate,
+      latestRun: latestRun,
+    };
   }),
 
   // test_web_scraper: protectedProcedure.mutation(async ({ ctx, input }) => {

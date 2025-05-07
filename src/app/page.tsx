@@ -29,7 +29,7 @@ export default function Component() {
     to: dateRange?.to,
   });
   const categories = api.post.getSubjects.useQuery();
-
+  const dates = api.post.get_latest_date_of_Cronjob.useQuery();
   function ToggleCategory(input: string) {
     if (currentcategory === input) {
       setcurrentcategory("All");
@@ -41,6 +41,24 @@ export default function Component() {
   function handle_loading_animation(boolean: boolean, string: string) {
     setIsLoading(boolean);
     setIsLoading_button(string);
+  }
+
+  function calculate_daysBetween(date1: Date, date2: Date): number {
+    const msPerDay = 1000 * 60 * 60 * 24;
+
+    // Normalize both dates to midnight to avoid partial-day issues
+    const utc1 = Date.UTC(
+      date1.getFullYear(),
+      date1.getMonth(),
+      date1.getDate(),
+    );
+    const utc2 = Date.UTC(
+      date2.getFullYear(),
+      date2.getMonth(),
+      date2.getDate(),
+    );
+
+    return Math.floor((utc2 - utc1) / msPerDay);
   }
 
   function filteredArticles() {
@@ -88,7 +106,7 @@ export default function Component() {
                 {dateRange?.from ? (
                   dateRange.to ? (
                     <>
-                      {format(dateRange.from, "LLL dd, y")} -{" "}
+                      {format(dateRange.from, "LLL dd, y")} -
                       {format(dateRange.to, "LLL dd, y")}
                     </>
                   ) : (
@@ -110,6 +128,57 @@ export default function Component() {
                 className="calendar-transition"
               />
             </PopoverContent>
+            <div>
+              <div>
+                IMPORTANT INFO! THE APP DOESN{"'"}T USE YOUR TIMEZONE AND
+                INSTEAD DEFAULTS TO UTC
+              </div>
+              {dates.data?.currentDate && (
+                <div>Current Date: {dates.data?.currentDate.toISOString()}</div>
+              )}
+              {dates.data?.latestRun ? (
+                <div>
+                  <div>
+                    Last Automatic Update Date:{" "}
+                    {dates.data?.latestRun.runDate.toISOString()}
+                  </div>
+                  <div>
+                    {dates.data?.currentDate && (
+                      <div>
+                        {}
+                        Days since last update:{" "}
+                        {calculate_daysBetween(
+                          dates.data?.currentDate,
+                          dates.data?.latestRun.runDate,
+                        )}
+                        <div>
+                          {calculate_daysBetween(
+                            dates.data?.currentDate,
+                            dates.data?.latestRun.runDate,
+                          ) > 3 ? (
+                            <p>
+                              <div>
+                                More than 3 days have passed since last update!
+                              </div>
+                              <div>
+                                PLEASE CONTACT THE ADMINISTRATOR OF THIS WEBSITE
+                                SO HE CAN FIX THIS ISSUE
+                              </div>
+                            </p>
+                          ) : (
+                            <p>
+                              3 days or fewer have passed since last update.
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div> No previous runs available </div>
+              )}
+            </div>
           </Popover>
         </div>
 
@@ -137,10 +206,10 @@ export default function Component() {
                     <div>
                       {article.href_links && article.href_links.length > 0 && (
                         <HrefLinks href_links={article.href_links} />
-                      )}{" "}
+                      )}
                     </div>
                   </div>
-                )}{" "}
+                )}
                 {currentArticle !== article.href_title_date && (
                   <button
                     onClick={() => {
