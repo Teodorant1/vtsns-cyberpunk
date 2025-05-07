@@ -179,7 +179,17 @@ export default function Component() {
                   </div>
                 </div>
               ) : (
-                <div> No previous runs available </div>
+                <div>
+                  <div>No previous runs available</div>
+                  <div>
+                    {!articles.data && !categories.data && (
+                      <div>
+                        No Categories or Articles Available (Probably still
+                        loading)
+                      </div>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
           </Popover>
