@@ -93,7 +93,7 @@ export default function Component() {
           "Loading categories please wait................"
         )}
 
-        <div className="mb-6 flex space-x-4">
+        <div className="mb-6 flex-col space-x-4">
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -128,71 +128,69 @@ export default function Component() {
                 className="calendar-transition"
               />
             </PopoverContent>
-            <div>
-              {dates.data?.currentDate && (
-                <div>
-                  IMPORTANT INFO! THE APP DOESN{"'"}T USE YOUR TIMEZONE AND
-                  INSTEAD DEFAULTS TO UTC
-                </div>
-              )}
+          </Popover>
+          <div className="mt-5">
+            {dates.data?.currentDate && (
+              <div>
+                IMPORTANT INFO! THE APP DOESN{"'"}T USE YOUR TIMEZONE AND
+                INSTEAD DEFAULTS TO UTC
+              </div>
+            )}
 
-              {dates.data?.currentDate && (
-                <div>Current Date: {dates.data?.currentDate.toISOString()}</div>
-              )}
-              {dates.data?.latestRun ? (
+            {dates.data?.currentDate && (
+              <div>Current Date: {dates.data?.currentDate.toISOString()}</div>
+            )}
+            {dates.data?.latestRun ? (
+              <div>
                 <div>
-                  <div>
-                    Last Automatic Update Date:{" "}
-                    {dates.data?.latestRun.runDate.toISOString()}
-                  </div>
-                  <div>
-                    {dates.data?.currentDate && (
+                  Last Automatic Update Date:{" "}
+                  {dates.data?.latestRun.runDate.toISOString()}
+                </div>
+                <div>
+                  {dates.data?.currentDate && (
+                    <div>
+                      {}
+                      Days since last update:{" "}
+                      {calculate_daysBetween(
+                        dates.data?.currentDate,
+                        dates.data?.latestRun.runDate,
+                      )}
                       <div>
-                        {}
-                        Days since last update:{" "}
                         {calculate_daysBetween(
                           dates.data?.currentDate,
                           dates.data?.latestRun.runDate,
+                        ) > 3 ? (
+                          <p>
+                            <div>
+                              More than 3 days have passed since last update!
+                            </div>
+                            <div>
+                              PLEASE CONTACT THE ADMINISTRATOR OF THIS WEBSITE
+                              SO HE CAN FIX THIS ISSUE
+                            </div>
+                          </p>
+                        ) : (
+                          <p>3 days or fewer have passed since last update.</p>
                         )}
-                        <div>
-                          {calculate_daysBetween(
-                            dates.data?.currentDate,
-                            dates.data?.latestRun.runDate,
-                          ) > 3 ? (
-                            <p>
-                              <div>
-                                More than 3 days have passed since last update!
-                              </div>
-                              <div>
-                                PLEASE CONTACT THE ADMINISTRATOR OF THIS WEBSITE
-                                SO HE CAN FIX THIS ISSUE
-                              </div>
-                            </p>
-                          ) : (
-                            <p>
-                              3 days or fewer have passed since last update.
-                            </p>
-                          )}
-                        </div>
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
-              ) : (
+              </div>
+            ) : (
+              <div>
+                <div>No previous runs available</div>
                 <div>
-                  <div>No previous runs available</div>
-                  <div>
-                    {!articles.data && !categories.data && (
-                      <div>
-                        No Categories or Articles Available (Probably still
-                        loading)
-                      </div>
-                    )}
-                  </div>
+                  {!articles.data && !categories.data && (
+                    <div>
+                      No Categories or Articles Available (Probably still
+                      loading)
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </Popover>
+              </div>
+            )}
+          </div>
         </div>
 
         {articles.data && dateRange?.from && dateRange.to ? (
