@@ -26,10 +26,16 @@ export async function scrape_Predmeti_info() {
     const titleElement = $(element).find("h2.entry-title a");
 
     const datetime = timeElement.attr("datetime") ?? "";
+
+    // console.log("datetime", datetime);
+
     const title = titleElement.text().trim() ?? "";
     const href = titleElement.attr("href") ?? "";
 
     const date = datetime ? new Date(datetime) : null;
+
+    // console.log("datetime constructed into date", date);
+
     const href_title_date = `${title}${href}${date?.toDateString()}`;
     const title_analysis = break_title_into_data(title);
 
@@ -47,6 +53,8 @@ export async function scrape_Predmeti_info() {
 
   const postsDataResolved = await Promise.all(postPromises);
 
+  console.log("postsDataResolved", postsDataResolved);
+
   const refinedPosts: {
     text: string;
     href: string;
@@ -59,7 +67,7 @@ export async function scrape_Predmeti_info() {
     isSpecial_announcement: boolean;
     has_been_announced_in_discord: boolean | null;
   }[] = [];
-  console.log(refinedPosts);
+  // console.log(refinedPosts);
   for (let i = 0; i < postsDataResolved.length; i++) {
     const article = {
       text: postsDataResolved[i]?.article.combinedText ?? "",
@@ -68,7 +76,7 @@ export async function scrape_Predmeti_info() {
       href_title_date: postsDataResolved[i]?.href_title_date ?? "",
       subject: postsDataResolved[i]?.title_analysis.subject ?? "",
       href_links: postsDataResolved[i]?.article.hrefLinks ?? [],
-      createdAt: new Date(),
+      createdAt: postsDataResolved[i]?.date ?? new Date(),
       updatedAt: new Date(),
       isSpecial_announcement:
         postsDataResolved[i]?.title_analysis.is_general_announcement ?? false,
@@ -105,16 +113,16 @@ export async function scrape_vtsns_article(url: string) {
 }
 
 function break_title_into_data(input: string) {
-  console.log("input", input);
+  // console.log("input", input);
   const slices = input.split(" ");
-  console.log("slices", slices);
+  // console.log("slices", slices);
 
   const subject_and_title = {
     subject: " ",
     title: input,
     is_general_announcement: true,
   };
-  console.log("slices.includes(-):", slices.includes("-"));
+  // console.log("slices.includes(-):", slices.includes("-"));
   if (slices.includes("-")) {
     const slices2 = input.split("-");
 
@@ -123,7 +131,7 @@ function break_title_into_data(input: string) {
     subject_and_title.is_general_announcement = false;
     return subject_and_title;
   }
-  console.log("v2 slices.includes(–):", slices.includes("–"));
+  // console.log("v2 slices.includes(–):", slices.includes("–"));
   if (slices.includes("–")) {
     const slices2 = input.split("–");
 
@@ -133,7 +141,7 @@ function break_title_into_data(input: string) {
     return subject_and_title;
   }
 
-  console.log("subject_and_title", subject_and_title);
+  // console.log("subject_and_title", subject_and_title);
 
   return subject_and_title;
 }
@@ -149,10 +157,10 @@ export async function shouldRunJob() {
     return true;
   }
 
-  console.log("latestRun", latestRun);
+  // console.log("latestRun", latestRun);
 
   const currentTime = new Date();
-  console.log("currentTime", currentTime);
+  // console.log("currentTime", currentTime);
 
   const lastRunTime = new Date(latestRun.runDate);
 
