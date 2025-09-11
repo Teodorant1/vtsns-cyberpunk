@@ -58,7 +58,7 @@ export default function Component() {
       date2.getDate(),
     );
 
-    return Math.floor((utc2 - utc1) / msPerDay);
+    return Math.floor((utc1 - utc2) / msPerDay);
   }
 
   function filteredArticles() {
