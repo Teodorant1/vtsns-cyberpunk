@@ -1,5 +1,6 @@
 import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
+
 import { eq } from "drizzle-orm";
 import {
   getServerSession,

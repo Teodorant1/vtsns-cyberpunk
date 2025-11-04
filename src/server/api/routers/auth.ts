@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { userProfiles, users } from "~/server/db/schema";
+import bcrypt from "bcryptjs";
 
 export const AuthRouter = createTRPCRouter({
   register: publicProcedure
@@ -13,12 +14,14 @@ export const AuthRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       try {
+        const hashedPassword = await bcrypt.hash(input.password, 10);
+
         await ctx.db.transaction(async (tx) => {
           const user = await tx
             .insert(users)
             .values({
               username: input.username,
-              password: input.password,
+              password: hashedPassword,
               email: input.email,
             })
             .returning();
