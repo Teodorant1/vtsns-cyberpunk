@@ -42,12 +42,12 @@ export const AuthRouter = createTRPCRouter({
           }
         });
 
-        return { error: true, errorText: null };
+        return { error: false, errorText: null };
       } catch (error) {
         if (error instanceof Error) {
           return { error: true, errorText: error.message };
         }
       }
-      return { error: true, errorText: null };
+      return { error: false, errorText: null };
     }),
 });

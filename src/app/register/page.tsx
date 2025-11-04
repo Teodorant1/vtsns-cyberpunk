@@ -22,7 +22,7 @@ export default function RegisterPage() {
 
   const registerMutation = api.auth.register.useMutation({
     onSuccess: async (data) => {
-      if (data.error) {
+      if (data.error === true) {
         setErrorText(data.errorText ?? "REGISTRATION FAILED");
         setError(true);
       } else {
@@ -34,6 +34,8 @@ export default function RegisterPage() {
           password: formData.password,
           redirect: false,
         });
+
+        router.push("/");
       }
     },
   });
