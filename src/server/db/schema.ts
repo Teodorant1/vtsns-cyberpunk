@@ -16,8 +16,6 @@ export const jobRuns = createTable("job_runs", {
   runDate: timestamp("runDate", { withTimezone: true }).primaryKey().notNull(),
 });
 
-// `users` table consolidated below (merged fields from previous `actual_users`)
-
 export const error = createTable("error", {
   id: uuid("id")
     .primaryKey()
@@ -84,12 +82,8 @@ export const users = createTable("user", {
     .notNull()
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  // Primary public handle / login username
   username: varchar("username", { length: 255 }).unique().notNull(),
-  // Optional display name
-  name: varchar("name", { length: 255 }),
   email: varchar("email", { length: 255 }).notNull().unique(),
-  // Hashed password for credential auth
   password: varchar("password", { length: 255 }).notNull(),
   role: varchar("role", { length: 50 }).notNull().default("user"),
   emailVerified: timestamp("email_verified", {

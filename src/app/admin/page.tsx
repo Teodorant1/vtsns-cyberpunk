@@ -5,7 +5,7 @@ import { api } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
 
 export default function AdminPage() {
-  const usersQuery = api.admin.listUsers.useQuery(undefined, { enabled: true });
+  const usersQuery = api.admin.listUsers.useQuery();
   const pendingIntelQuery = api.admin.listPendingIntel.useQuery(undefined, {
     enabled: true,
   });

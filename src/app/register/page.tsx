@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { Button } from "~/components/ui/button";
+import ErrorPopup from "~/components/ui/error-popup";
 import { useRouter } from "next/navigation";
+import { api } from "~/trpc/react";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -14,50 +16,43 @@ export default function RegisterPage() {
     confirmPassword: "",
   });
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [isLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [errorText, setErrorText] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const registerMutation = api.auth.register.useMutation({
+    onSuccess: async (data) => {
+      if (data.error) {
+        setErrorText(data.errorText ?? "REGISTRATION FAILED");
+        setError(true);
+      } else {
+        setError(false);
+        setErrorText("");
+
+        await signIn("credentials", {
+          email: formData.email,
+          password: formData.password,
+          redirect: false,
+        });
+      }
+    },
+  });
+
+  function handle_registerMutation(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
-    setIsLoading(true);
 
     if (formData.password !== formData.confirmPassword) {
-      setError("ENCRYPTION KEYS DO NOT MATCH");
-      setIsLoading(false);
+      setErrorText("ENCRYPTION KEYS DO NOT MATCH");
+      setError(true);
       return;
     }
 
-    try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
-
-      if (!response.ok) {
-        const data = (await response.json()) as { error?: string };
-        throw new Error(data.error ?? "REGISTRATION FAILED");
-      }
-
-      // Auto-login after successful registration
-      await signIn("credentials", {
-        email: formData.email,
-        password: formData.password,
-        redirect: false,
-      });
-
-      router.push("/profile");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "SYSTEM ERROR");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    registerMutation.mutate({
+      username: formData.username,
+      email: formData.email,
+      password: formData.password,
+    });
+  }
 
   return (
     <div className="min-h-screen bg-black p-8 text-red-500">
@@ -67,7 +62,7 @@ export default function RegisterPage() {
             NETRUNNER REGISTRATION
           </h1>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handle_registerMutation} className="space-y-6">
             <div>
               <label className="mb-2 block text-sm">HANDLE (USERNAME):</label>
               <input
@@ -130,13 +125,14 @@ export default function RegisterPage() {
               />
             </div>
 
-            {error && (
-              <div className="text-center text-red-600">
-                <span className="glitch">{error}</span>
-              </div>
-            )}
+            <ErrorPopup
+              visible={error}
+              message={errorText}
+              onClose={() => setError(false)}
+              timeout={15000}
+            />
 
-            <div className="flex justify-end space-x-4">
+            <div className="flex w-full justify-between px-4">
               <Button
                 type="button"
                 onClick={() => router.push("/login")}
@@ -157,8 +153,8 @@ export default function RegisterPage() {
 
         <div className="mt-4 text-center text-sm text-red-400">
           <p>
-            By registering, you agree to submit to the authority of the
-            megacorporations and accept the risks of netrunning.
+            By registering, you agree to NEVER submit to the authority of the
+            megacorporations and always stand against them.
           </p>
         </div>
       </div>

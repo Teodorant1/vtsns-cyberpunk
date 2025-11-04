@@ -14,7 +14,6 @@ declare module "next-auth" {
     user: {
       id: string;
       username?: string | null;
-      can_create_AI_decks?: boolean | null;
       role?: "user" | "admin" | null;
     } & DefaultSession["user"];
   }
@@ -24,7 +23,6 @@ declare module "next-auth/jwt" {
   interface JWT {
     id?: string;
     username?: string | null;
-    can_create_AI_decks?: boolean | null;
     role?: "user" | "admin" | null;
   }
 }
@@ -36,7 +34,6 @@ type AuthUser = {
   email: string;
   username?: string | null;
   image?: string | null;
-  can_create_AI_decks?: boolean | null;
   role?: UserRole;
 };
 
@@ -51,7 +48,6 @@ export const authOptions: NextAuthOptions = {
         // user comes from authorize result
         token.id = user.id;
         token.username = user.username ?? null;
-        token.can_create_AI_decks = user.can_create_AI_decks ?? null;
         token.role = user.role ?? "user";
       }
       return token;
@@ -63,7 +59,6 @@ export const authOptions: NextAuthOptions = {
         ...session.user,
         id: token.id!,
         username: token.username ?? undefined,
-        can_create_AI_decks: token.can_create_AI_decks ?? undefined,
         role: token.role ?? "user",
       },
     }),
@@ -85,22 +80,19 @@ export const authOptions: NextAuthOptions = {
 
         if (!user) return null;
 
-        // Compare password using bcrypt
         const isValid = await bcrypt.compare(
           credentials.password,
           user.password,
         );
         if (!isValid) return null;
 
-        // Return a minimal user object. Fields returned here will be available
-        // on `user` during sign in and can be persisted to the JWT.
         const role = user.role as UserRole;
         const result: AuthUser = {
           id: user.id,
           email: user.email,
           username: user.username,
           image: user.image,
-          role: role ?? "user", // Default to "user" if no role is set
+          role: role ?? "user",
         };
 
         console.log("Successful authorization RESULT for user:", result);
