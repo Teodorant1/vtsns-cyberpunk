@@ -40,7 +40,6 @@ export default function FAQPage() {
 
   return (
     <div className="min-h-screen bg-black text-red-500">
-      <div className="scanline"></div>
       <main className="container mx-auto py-8">
         <h1 className="glitch mb-8 flex items-center text-3xl font-bold text-white">
           Web Scraping{" "}

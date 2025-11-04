@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
+import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react"; // For hamburger and close icons
 
 const LayoutHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { data: session } = useSession();
 
   return (
     <header className="border-b border-red-800 bg-black p-4">
@@ -42,6 +44,33 @@ const LayoutHeader = () => {
           >
             Discord
           </Link>
+          <div className="flex items-center space-x-4">
+            {session?.user ? (
+              <>
+                <Link href="/profile" className="font-bold hover:text-red-400">
+                  {session.user.username ?? session.user.email}
+                </Link>
+                <button
+                  onClick={() => void signOut()}
+                  className="font-bold hover:text-red-400"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/api/auth/signin"
+                  className="font-bold hover:text-red-400"
+                >
+                  Sign In
+                </Link>
+                <Link href="/register" className="font-bold hover:text-red-400">
+                  Register
+                </Link>
+              </>
+            )}
+          </div>
         </nav>
       </div>
 
@@ -71,6 +100,43 @@ const LayoutHeader = () => {
           >
             Discord
           </Link>
+          {session?.user ? (
+            <>
+              <Link
+                href="/profile"
+                className="font-bold hover:text-red-400"
+                onClick={() => setIsOpen(false)}
+              >
+                {session.user.username ?? session.user.email}
+              </Link>
+              <button
+                onClick={() => {
+                  void signOut();
+                  setIsOpen(false);
+                }}
+                className="font-bold hover:text-red-400"
+              >
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/api/auth/signin"
+                className="font-bold hover:text-red-400"
+                onClick={() => setIsOpen(false)}
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/register"
+                className="font-bold hover:text-red-400"
+                onClick={() => setIsOpen(false)}
+              >
+                Register
+              </Link>
+            </>
+          )}
         </nav>
       )}
     </header>

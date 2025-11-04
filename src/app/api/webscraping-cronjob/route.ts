@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "~/server/db";
-import { jobRuns } from "~/server/db/schema";
+import { jobRuns, error } from "~/server/db/schema";
 import {
   shouldRunJob,
   scrape_vtsns_CRONJOB,
@@ -27,10 +27,17 @@ export async function POST(request: Request) {
       status: 200,
       Skipped: true,
     });
-  } catch (error) {
-    console.log("error", error);
+  } catch (err) {
+    console.log("error", err);
+
+    if (err instanceof Error) {
+      await db.insert(error).values({
+        text: err.message,
+      });
+    }
+
     return NextResponse.json(
-      { message: "Failed to process data", error: error as Error },
+      { message: "Failed to process data", error: err as Error },
       { status: 400 },
     );
   }
