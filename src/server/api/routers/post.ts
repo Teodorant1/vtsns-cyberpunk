@@ -5,7 +5,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { article, jobRuns, posts } from "~/server/db/schema";
+import { article, jobRuns, posts, articleComments } from "~/server/db/schema";
 import { and, desc, gte, lte } from "drizzle-orm";
 // import { scrape_vtsns_CRONJOB } from "~/utilities/random-functions";
 
@@ -32,6 +32,9 @@ export const postRouter = createTRPCRouter({
               ),
               orderBy: (articles, { desc }) => [desc(articles.createdAt)],
               limit: 50,
+              with: {
+                comments: true,
+              },
             });
 
             return latestArticles2;
@@ -45,6 +48,9 @@ export const postRouter = createTRPCRouter({
 
             orderBy: (articles, { desc }) => [desc(articles.createdAt)],
             limit: 50,
+            with: {
+              comments: true,
+            },
           });
           return latestArticles3;
         }

@@ -20,6 +20,15 @@ const LayoutHeader = () => {
           alt="vtsns-logo"
         />
 
+        {/* <button
+          className="text-white"
+          onClick={() => {
+            console.log(session);
+          }}
+        >
+          PRINT SESSION
+        </button> */}
+
         {/* Mobile Menu Toggle */}
         <button
           className="text-white focus:outline-none md:hidden"

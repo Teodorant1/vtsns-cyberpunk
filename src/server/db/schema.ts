@@ -58,12 +58,78 @@ export const article = createTable("article", {
 });
 export type article_type = typeof article.$inferSelect;
 
+// ─────────────────────────────
+// POSTS
+// ─────────────────────────────
+export const posts = createTable("post", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 256 }),
+
+  createdById: varchar("created_by", { length: 255 })
+    .notNull()
+    .references(() => users.id),
+
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+
+  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+    () => new Date(),
+  ),
+});
+
+// ─────────────────────────────
+// POST COMMENTS
+// ─────────────────────────────
+export const postComments = createTable("post_comment", {
+  id: serial("id").primaryKey(),
+  content: text("content").notNull(),
+
+  postId: integer("post_id")
+    .notNull()
+    .references(() => posts.id, { onDelete: "cascade" }),
+
+  createdById: varchar("created_by", { length: 255 })
+    .notNull()
+    .references(() => users.id),
+
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+    () => new Date(),
+  ),
+});
+
+// ─────────────────────────────
+// ARTICLE COMMENTS
+// ─────────────────────────────
+export const articleComments = createTable("article_comment", {
+  id: serial("id").primaryKey(),
+  content: text("content").notNull(),
+
+  articleId: uuid("article_id")
+    .notNull()
+    .references(() => article.id, { onDelete: "cascade" }),
+
+  createdById: varchar("created_by", { length: 255 })
+    .notNull()
+    .references(() => users.id),
+
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+    () => new Date(),
+  ),
+});
+
 export const subject = createTable("subject", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 1000 }).notNull().unique(),
 });
 
-export const posts = createTable("post", {
+export const comment = createTable("comment", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 256 }),
   createdById: varchar("created_by", { length: 255 })
@@ -145,3 +211,47 @@ export const userProfiles = createTable("user_profile", {
     () => new Date(),
   ),
 });
+
+// POSTS RELATIONS
+export const postsRelations = relations(posts, ({ one, many }) => ({
+  author: one(users, {
+    fields: [posts.createdById],
+    references: [users.id],
+  }),
+  comments: many(postComments),
+}));
+
+// ARTICLES RELATIONS
+export const articlesRelations = relations(article, ({ many }) => ({
+  comments: many(articleComments),
+}));
+
+// POST COMMENTS RELATIONS
+export const postCommentsRelations = relations(postComments, ({ one }) => ({
+  post: one(posts, {
+    fields: [postComments.postId],
+    references: [posts.id],
+  }),
+  author: one(users, {
+    fields: [postComments.createdById],
+    references: [users.id],
+  }),
+}));
+
+// ARTICLE COMMENTS RELATIONS
+export const articleCommentsRelations = relations(
+  articleComments,
+  ({ one }) => ({
+    article: one(article, {
+      fields: [articleComments.articleId],
+      references: [article.id],
+    }),
+    author: one(users, {
+      fields: [articleComments.createdById],
+      references: [users.id],
+    }),
+  }),
+);
+
+export type postComments_type = typeof postComments.$inferSelect;
+export type articleComments_type = typeof articleComments.$inferSelect;
