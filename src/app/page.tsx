@@ -13,6 +13,7 @@ import { type DateRange } from "react-day-picker";
 import PaginatedList from "./_components/PaginatedList";
 import { api } from "~/trpc/react";
 import HrefLinks from "./_components/href_list";
+import CommentBox from "./_components/commentBox";
 
 export default function Component() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({

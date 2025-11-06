@@ -33,7 +33,9 @@ export const postRouter = createTRPCRouter({
               orderBy: (articles, { desc }) => [desc(articles.createdAt)],
               limit: 50,
               with: {
-                comments: true,
+                comments: {
+                  orderBy: (comments, { desc }) => [desc(comments.createdAt)],
+                },
               },
             });
 
@@ -49,7 +51,9 @@ export const postRouter = createTRPCRouter({
             orderBy: (articles, { desc }) => [desc(articles.createdAt)],
             limit: 50,
             with: {
-              comments: true,
+              comments: {
+                orderBy: (comments, { desc }) => [desc(comments.createdAt)],
+              },
             },
           });
           return latestArticles3;

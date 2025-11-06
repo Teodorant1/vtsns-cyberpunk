@@ -89,6 +89,9 @@ export const postComments = createTable("post_comment", {
     .notNull()
     .references(() => posts.id, { onDelete: "cascade" }),
 
+  poster: varchar("poster", { length: 255 })
+    .notNull()
+    .references(() => users.username),
   createdById: varchar("created_by", { length: 255 })
     .notNull()
     .references(() => users.id),
@@ -111,7 +114,9 @@ export const articleComments = createTable("article_comment", {
   articleId: uuid("article_id")
     .notNull()
     .references(() => article.id, { onDelete: "cascade" }),
-
+  poster: varchar("poster", { length: 255 })
+    .notNull()
+    .references(() => users.username),
   createdById: varchar("created_by", { length: 255 })
     .notNull()
     .references(() => users.id),
@@ -127,20 +132,6 @@ export const articleComments = createTable("article_comment", {
 export const subject = createTable("subject", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 1000 }).notNull().unique(),
-});
-
-export const comment = createTable("comment", {
-  id: serial("id").primaryKey(),
-  name: varchar("name", { length: 256 }),
-  createdById: varchar("created_by", { length: 255 })
-    .notNull()
-    .references(() => users.id),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date(),
-  ),
 });
 
 export const users = createTable("user", {
