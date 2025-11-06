@@ -112,9 +112,7 @@ export const postComments = createTable("post_comment", {
 // ARTICLE COMMENTS
 // ─────────────────────────────
 export const articleComments = createTable("article_comment", {
-  id: uuid("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
+  id: serial("id").primaryKey(),
   content: text("content").notNull(),
 
   articleId: uuid("article_id")

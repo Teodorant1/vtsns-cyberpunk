@@ -7,30 +7,42 @@ import {
 } from "~/server/api/trpc";
 import { article, jobRuns, posts, articleComments } from "~/server/db/schema";
 import { and, desc, gte, lte } from "drizzle-orm";
-// import { scrape_vtsns_CRONJOB } from "~/utilities/random-functions";
+import { TRPCError } from "@trpc/server";
 
 export const postRouter = createTRPCRouter({
   create_comment: protectedProcedure
     .input(
       z.object({
-        articleID: z.string().min(1),
+        articleID: z.string().min(10),
         commentContent: z.string().min(1),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       try {
+        if (1 > 0) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Simulated error for testing purposes",
+          });
+        }
         if (
           !ctx.session.user.username ||
           typeof ctx.session.user.username !== "string"
         ) {
           throw new Error("Username not a string");
         }
-        const article_comment = await ctx.db.insert(articleComments).values({
+        await ctx.db.insert(articleComments).values({
           articleId: input.articleID,
           content: input.commentContent,
           poster: ctx.session.user.username,
         });
-      } catch (error) {}
+        return { error: false, errorText: null };
+      } catch (error) {
+        if (error instanceof Error) {
+          return { error: true, errorText: error.message };
+        }
+      }
+      return { error: false, errorText: null };
     }),
 
   getLatest_articles: publicProcedure

@@ -13,8 +13,7 @@ import { type DateRange } from "react-day-picker";
 import PaginatedList from "./_components/PaginatedList";
 import { api } from "~/trpc/react";
 import HrefLinks from "./_components/href_list";
-import CommentBox from "./_components/commentBox";
-
+import CommentList from "./_components/commentList";
 export default function Component() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(Date.UTC(2024, 8, 1)),
@@ -97,7 +96,7 @@ export default function Component() {
             <PopoverTrigger asChild>
               <Button
                 variant={"outline"}
-                className={`w-[300px] justify-start border-red-800 bg-gray-900 text-left font-normal text-red-500 ${
+                className={`w-[300px] justify-start border border-red-800 bg-gray-900 text-left font-normal text-red-500 ${
                   !dateRange ? "text-muted-foreground" : ""
                 }`}
               >
@@ -214,10 +213,13 @@ export default function Component() {
                 {currentArticle === article.href_title_date && (
                   <div className="mb-4 items-center justify-between text-sm text-red-400">
                     <p>{article.text}</p>
-                    <div>
+                    <div className="border-red-800">
                       {article.href_links && article.href_links.length > 0 && (
                         <HrefLinks href_links={article.href_links} />
                       )}
+                    </div>
+                    <div className="m-2 p-2">
+                      <CommentList articleId={article.id} />
                     </div>
                   </div>
                 )}

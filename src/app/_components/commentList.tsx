@@ -1,6 +1,5 @@
 "use client";
 
-import { api } from "~/trpc/react";
 import { useSession } from "next-auth/react";
 import { type articleComments_type } from "~/server/db/schema";
 import CommentBox from "./commentBox";
@@ -13,13 +12,12 @@ interface CommentListProps {
 export default function CommentList({ articleId, comments }: CommentListProps) {
   const { data: session } = useSession();
 
-  if (!comments)
-    return <p className="text-red-500">LOADING TRANSMISSIONS...</p>;
-
-  if (!comments || comments.length === 0)
-    return <p className="italic text-red-700">NO SIGNALS DETECTED...</p>;
-
-  return (
+  return !comments ? (
+    <div className="space-y-4">
+      <p className="italic text-red-700">NO SIGNALS DETECTED...</p>
+      {session && <CommentBox articleId={articleId} />}
+    </div>
+  ) : (
     <div className="mt-6 space-y-4">
       {comments.map((comment) => (
         <div
@@ -40,7 +38,7 @@ export default function CommentList({ articleId, comments }: CommentListProps) {
           )}
         </div>
       ))}
-      {session && <CommentBox articleId={articleId} />}{" "}
+      {session && <CommentBox articleId={articleId} />}
     </div>
   );
 }

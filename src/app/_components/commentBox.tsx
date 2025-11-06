@@ -3,38 +3,54 @@
 import { useState } from "react";
 import { api } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
-
+import ErrorPopup from "~/components/ui/error-popup";
 interface CommentBoxProps {
   articleId?: string; // optional if you later add article-specific comments
 }
 
 export default function CommentBox({ articleId }: CommentBoxProps) {
   const [content, setContent] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [isLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [errorText, setErrorText] = useState("");
   const [success, setSuccess] = useState(false);
 
-  //   const postComment = api.comment.create.useMutation({
-  //     onSuccess: () => {
-  //       setContent("");
-  //       setSuccess(true);
-  //       setTimeout(() => setSuccess(false), 2000);
-  //     },
-  //     onError: (err) => {
-  //       setError(err.message);
-  //     },
-  //   });
+  const postComment = api.post.create_comment.useMutation({
+    onSuccess: (e) => {
+      setContent("");
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 2000);
+      if (e.error) {
+        console.error("Error posting comment:", e.errorText);
+        setErrorText(e.errorText ?? "TRANSMISSION FAILED");
+        setError(true);
+      }
+    },
+    onError: (err) => {
+      setErrorText(err.message);
+      setError(true);
+    },
+  });
 
-  //   const handleSubmit = (e: React.FormEvent) => {
-  //     e.preventDefault();
-  //     if (!content.trim()) return setError("EMPTY TRANSMISSION DETECTED");
-  //     postComment.mutate({ content, articleId });
-  //   };
+  function handle_postComment() {
+    if (!content.trim()) {
+      setErrorText("EMPTY TRANSMISSION DETECTED");
+      return;
+    }
+    postComment.mutate({ articleID: articleId ?? "", commentContent: content });
+  }
 
   return (
-    <form
+    <div
       //   onSubmit={handleSubmit}
       className="rounded-lg border border-red-800 bg-gray-900 p-4 shadow-lg"
     >
+      <ErrorPopup
+        visible={error}
+        message={errorText}
+        onClose={() => setError(false)}
+        timeout={15000}
+      />
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
@@ -48,12 +64,14 @@ export default function CommentBox({ articleId }: CommentBoxProps) {
       )}
       <div className="mt-3 flex justify-end">
         <Button
-          type="submit"
+          onClick={() => {
+            handle_postComment();
+          }}
           className="border-red-800 bg-gray-800 text-red-500 hover:bg-gray-700"
         >
           TRANSMIT
         </Button>
       </div>
-    </form>
+    </div>
   );
 }
