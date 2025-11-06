@@ -32,10 +32,12 @@ export const intelRouter = createTRPCRouter({
         });
       }
 
-      return ctx.db.insert(intelSubmissions).values({
-        ...input,
-        createdById: ctx.session.user.id,
-      });
+      // await ctx.db.insert(intelSubmissions).values({
+      //   poster: ctx.session.user.username,
+      //   title: input.title,
+      //   content: input.content,
+      //   createdById: ctx.session.user.id,
+      // });
     }),
 
   getLatestIntel: publicProcedure
@@ -103,7 +105,7 @@ export const intelRouter = createTRPCRouter({
         with: {
           user: {
             columns: {
-              name: true,
+              username: true,
               image: true,
             },
           },

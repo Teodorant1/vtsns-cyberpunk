@@ -64,10 +64,11 @@ export type article_type = typeof article.$inferSelect;
 export const posts = createTable("post", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 256 }),
+  text: varchar("text", { length: 25600 }).notNull(),
 
-  createdById: varchar("created_by", { length: 255 })
-    .notNull()
-    .references(() => users.id),
+  // createdById: varchar("created_by", { length: 255 })
+  //   .notNull()
+  //   .references(() => users.id),
 
   createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
@@ -76,6 +77,9 @@ export const posts = createTable("post", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
     () => new Date(),
   ),
+  poster: varchar("poster", { length: 255 })
+    .notNull()
+    .references(() => users.username),
 });
 
 // ─────────────────────────────
@@ -92,9 +96,9 @@ export const postComments = createTable("post_comment", {
   poster: varchar("poster", { length: 255 })
     .notNull()
     .references(() => users.username),
-  createdById: varchar("created_by", { length: 255 })
-    .notNull()
-    .references(() => users.id),
+  // createdById: varchar("created_by", { length: 255 })
+  //   .notNull()
+  //   .references(() => users.id),
 
   createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
@@ -108,7 +112,9 @@ export const postComments = createTable("post_comment", {
 // ARTICLE COMMENTS
 // ─────────────────────────────
 export const articleComments = createTable("article_comment", {
-  id: serial("id").primaryKey(),
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   content: text("content").notNull(),
 
   articleId: uuid("article_id")
@@ -117,16 +123,13 @@ export const articleComments = createTable("article_comment", {
   poster: varchar("poster", { length: 255 })
     .notNull()
     .references(() => users.username),
-  createdById: varchar("created_by", { length: 255 })
-    .notNull()
-    .references(() => users.id),
 
   createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date(),
-  ),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .$onUpdate(() => new Date())
+    .default(sql`CURRENT_TIMESTAMP`),
 });
 
 export const subject = createTable("subject", {
@@ -158,6 +161,9 @@ export const intelSubmissions = createTable("intel_submission", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
+  poster: varchar("poster", { length: 255 })
+    .notNull()
+    .references(() => users.username),
   title: varchar("title", { length: 255 }).notNull(),
   content: text("content").notNull(),
   subject: varchar("subject", { length: 100 }).notNull(),
@@ -179,8 +185,8 @@ export const intelSubmissionsRelations = relations(
   intelSubmissions,
   ({ one }) => ({
     author: one(users, {
-      fields: [intelSubmissions.createdById],
-      references: [users.id],
+      fields: [intelSubmissions.poster],
+      references: [users.username],
     }),
   }),
 );
@@ -202,12 +208,17 @@ export const userProfiles = createTable("user_profile", {
     () => new Date(),
   ),
 });
-
+export const userProfilesRelations = relations(userProfiles, ({ one }) => ({
+  user: one(users, {
+    fields: [userProfiles.userId],
+    references: [users.id],
+  }),
+}));
 // POSTS RELATIONS
 export const postsRelations = relations(posts, ({ one, many }) => ({
   author: one(users, {
-    fields: [posts.createdById],
-    references: [users.id],
+    fields: [posts.poster],
+    references: [users.username],
   }),
   comments: many(postComments),
 }));
@@ -224,8 +235,8 @@ export const postCommentsRelations = relations(postComments, ({ one }) => ({
     references: [posts.id],
   }),
   author: one(users, {
-    fields: [postComments.createdById],
-    references: [users.id],
+    fields: [postComments.poster],
+    references: [users.username],
   }),
 }));
 
@@ -238,8 +249,8 @@ export const articleCommentsRelations = relations(
       references: [article.id],
     }),
     author: one(users, {
-      fields: [articleComments.createdById],
-      references: [users.id],
+      fields: [articleComments.poster],
+      references: [users.username],
     }),
   }),
 );

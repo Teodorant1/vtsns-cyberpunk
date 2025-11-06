@@ -10,6 +10,29 @@ import { and, desc, gte, lte } from "drizzle-orm";
 // import { scrape_vtsns_CRONJOB } from "~/utilities/random-functions";
 
 export const postRouter = createTRPCRouter({
+  create_comment: protectedProcedure
+    .input(
+      z.object({
+        articleID: z.string().min(1),
+        commentContent: z.string().min(1),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        if (
+          !ctx.session.user.username ||
+          typeof ctx.session.user.username !== "string"
+        ) {
+          throw new Error("Username not a string");
+        }
+        const article_comment = await ctx.db.insert(articleComments).values({
+          articleId: input.articleID,
+          content: input.commentContent,
+          poster: ctx.session.user.username,
+        });
+      } catch (error) {}
+    }),
+
   getLatest_articles: publicProcedure
     .input(
       z.object({
@@ -102,10 +125,10 @@ export const postRouter = createTRPCRouter({
   create: protectedProcedure
     .input(z.object({ name: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.insert(posts).values({
-        name: input.name,
-        createdById: ctx.session.user.id,
-      });
+      // await ctx.db.insert(posts).values({
+      //   name: input.name,
+      //   createdById: ctx.session.user.id,
+      // });
     }),
 
   getLatest: publicProcedure.query(async ({ ctx }) => {

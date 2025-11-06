@@ -105,7 +105,8 @@ export default function Component() {
                 {dateRange?.from ? (
                   dateRange.to ? (
                     <>
-                      {format(dateRange.from, "LLL dd, y")} -
+                      {format(dateRange.from, "LLL dd, y")}{" "}
+                      <span className="text-muted-foreground mx-2">–</span>
                       {format(dateRange.to, "LLL dd, y")}
                     </>
                   ) : (
