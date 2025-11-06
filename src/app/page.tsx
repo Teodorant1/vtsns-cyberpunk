@@ -219,7 +219,10 @@ export default function Component() {
                       )}
                     </div>
                     <div className="m-2 p-2">
-                      <CommentList articleId={article.id} />
+                      <CommentList
+                        articleId={article.id}
+                        comments={article.comments}
+                      />
                     </div>
                   </div>
                 )}

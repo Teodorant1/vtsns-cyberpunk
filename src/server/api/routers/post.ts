@@ -13,18 +13,22 @@ export const postRouter = createTRPCRouter({
   create_comment: protectedProcedure
     .input(
       z.object({
-        articleID: z.string().min(10),
-        commentContent: z.string().min(1),
+        articleID: z.string().min(1),
+        commentContent: z.string().min(10),
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      // if (1 > 0) {
+      //   throw new TRPCError({
+      //     code: "INTERNAL_SERVER_ERROR",
+      //     message: "Simulated TRPCerror for testing purposes",
+      //   });
+      // }
+      // if (1 > 0) {
+      //   throw new Error("Simulated regular error for testing purposes");
+      // }
+
       try {
-        if (1 > 0) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Simulated error for testing purposes",
-          });
-        }
         if (
           !ctx.session.user.username ||
           typeof ctx.session.user.username !== "string"

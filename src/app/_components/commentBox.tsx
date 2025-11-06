@@ -4,22 +4,26 @@ import { useState } from "react";
 import { api } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
 import ErrorPopup from "~/components/ui/error-popup";
+import { set } from "date-fns";
 interface CommentBoxProps {
   articleId?: string; // optional if you later add article-specific comments
 }
 
 export default function CommentBox({ articleId }: CommentBoxProps) {
   const [content, setContent] = useState("");
-  const [isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
   const [errorText, setErrorText] = useState("");
   const [success, setSuccess] = useState(false);
+  const trpc = api.useUtils();
 
   const postComment = api.post.create_comment.useMutation({
-    onSuccess: (e) => {
+    onSuccess: async (e) => {
       setContent("");
       setSuccess(true);
       setTimeout(() => setSuccess(false), 2000);
+      setIsLoading(false);
+      await trpc.post.getLatest_articles.invalidate();
       if (e.error) {
         console.error("Error posting comment:", e.errorText);
         setErrorText(e.errorText ?? "TRANSMISSION FAILED");
@@ -27,14 +31,18 @@ export default function CommentBox({ articleId }: CommentBoxProps) {
       }
     },
     onError: (err) => {
+      console.error("Error posting comment: ", err);
       setErrorText(err.message);
       setError(true);
+      setIsLoading(false);
     },
   });
 
   function handle_postComment() {
     if (!content.trim()) {
       setErrorText("EMPTY TRANSMISSION DETECTED");
+      setError(true);
+      setIsLoading(false);
       return;
     }
     postComment.mutate({ articleID: articleId ?? "", commentContent: content });

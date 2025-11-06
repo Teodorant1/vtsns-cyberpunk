@@ -16,15 +16,22 @@ export default function RegisterPage() {
     confirmPassword: "",
   });
 
-  const [isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
   const [errorText, setErrorText] = useState("");
 
   const registerMutation = api.auth.register.useMutation({
+    onError: (err) => {
+      console.error("Error posting comment: ", err);
+      setErrorText(err.message);
+      setError(true);
+      setIsLoading(false);
+    },
     onSuccess: async (data) => {
       if (data.error === true) {
         setErrorText(data.errorText ?? "REGISTRATION FAILED");
         setError(true);
+        setIsLoading(false);
       } else {
         setError(false);
         setErrorText("");

@@ -33,7 +33,7 @@ export default function CommentList({ articleId, comments }: CommentListProps) {
           <p className="mt-2 text-red-300">{comment.content}</p>
           {session?.user?.username === comment.poster && (
             <p className="mt-1 text-xs italic text-red-700">
-              (Your transmission:) {comment.content}
+              Your transmission :)
             </p>
           )}
         </div>
