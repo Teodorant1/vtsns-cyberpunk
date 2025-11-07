@@ -24,6 +24,7 @@ export default function CommentBox({ articleId }: CommentBoxProps) {
       setTimeout(() => setSuccess(false), 2000);
       setIsLoading(false);
       await trpc.post.getLatest_articles.invalidate();
+
       if (e.error) {
         console.error("Error posting comment:", e.errorText);
         setErrorText(e.errorText ?? "TRANSMISSION FAILED");

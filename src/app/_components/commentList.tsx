@@ -12,9 +12,11 @@ interface CommentListProps {
 export default function CommentList({ articleId, comments }: CommentListProps) {
   const { data: session } = useSession();
 
-  return !comments ? (
+  return !comments || comments.length === 0 ? (
     <div className="space-y-4">
-      <p className="italic text-red-700">NO SIGNALS DETECTED...</p>
+      <p className="border border-red-800 p-2 italic text-red-700">
+        NO SIGNALS DETECTED...
+      </p>
       {session && <CommentBox articleId={articleId} />}
     </div>
   ) : (
