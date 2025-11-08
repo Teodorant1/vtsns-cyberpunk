@@ -12,7 +12,7 @@ const LayoutHeader = () => {
 
   return (
     <header className="border-b border-red-800 bg-black p-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between">
         <Image
           src="/image00001.png"
           width={150}
@@ -38,7 +38,7 @@ const LayoutHeader = () => {
         </button>
 
         {/* Desktop Navigation */}
-        <nav className="hidden space-x-6 text-2xl text-white md:mr-[20%] md:flex">
+        <nav className="hidden space-x-6 text-2xl text-white md:ml-[10%] md:mr-[50%] md:flex">
           <Link href="/" className="font-bold hover:text-red-400">
             Headlines
           </Link>
@@ -53,17 +53,17 @@ const LayoutHeader = () => {
           >
             Discord
           </Link>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-start space-x-6">
             {session?.user ? (
               <>
                 <Link href="/profile" className="font-bold hover:text-red-400">
-                  {session.user.username ?? session.user.email}
+                  {session.user.username ?? "error can't read username"}
                 </Link>
                 <button
                   onClick={() => void signOut()}
-                  className="font-bold hover:text-red-400"
+                  className="w-fit font-bold hover:text-red-400"
                 >
-                  Sign Out
+                  Sign_Out
                 </button>
               </>
             ) : (

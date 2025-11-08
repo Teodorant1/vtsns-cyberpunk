@@ -14,7 +14,7 @@ export default function AccessDenied() {
       </p>
       <div className="mt-4 flex gap-4">
         <Button
-          onClick={() => router.push("/auth/signin")}
+          onClick={() => router.push("/api/auth/signin")}
           className="bg-red-600 hover:bg-red-700"
         >
           Sign In

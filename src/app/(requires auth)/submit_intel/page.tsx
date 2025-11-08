@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { api } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
 import { useRouter } from "next/navigation";
+import AccessDenied from "~/app/access-denied/page";
 
 export default function SubmitIntelPage() {
   const { data: session } = useSession();
@@ -26,16 +27,7 @@ export default function SubmitIntelPage() {
   });
 
   if (!session) {
-    return (
-      <div className="min-h-screen bg-black p-8 text-red-500">
-        <div className="text-center">
-          <h1 className="glitch text-2xl">ACCESS DENIED</h1>
-          <p className="mt-4">
-            Authentication required to access this terminal.
-          </p>
-        </div>
-      </div>
-    );
+    return <AccessDenied />;
   }
 
   return (

@@ -141,17 +141,17 @@ export default function RegisterPage() {
               timeout={15000}
             />
 
-            <div className="flex w-full justify-between px-4">
+            <div className="flex w-full flex-col justify-between px-4 md:flex-row">
               <Button
                 type="button"
                 onClick={() => router.push("/login")}
-                className="border-red-800 bg-gray-800 text-red-500 hover:bg-gray-700"
+                className="my-2 border-red-800 bg-gray-800 text-red-500 hover:bg-gray-700"
               >
                 RETURN TO LOGIN
               </Button>
               <Button
                 type="submit"
-                className="border-red-800 bg-gray-800 text-red-500 hover:bg-gray-700"
+                className="my-2 border-red-800 bg-gray-800 text-red-500 hover:bg-gray-700"
                 disabled={isLoading}
               >
                 {isLoading ? "INITIALIZING..." : "CREATE ACCOUNT"}

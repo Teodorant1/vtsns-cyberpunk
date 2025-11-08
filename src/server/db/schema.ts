@@ -62,13 +62,22 @@ export type article_type = typeof article.$inferSelect;
 // POSTS
 // ─────────────────────────────
 export const posts = createTable("post", {
-  id: serial("id").primaryKey(),
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   name: varchar("name", { length: 256 }),
+  link: varchar("link", { length: 2000 }),
   text: varchar("text", { length: 25600 }).notNull(),
-
+  poster: varchar("poster", { length: 255 })
+    .notNull()
+    .references(() => users.username),
   // createdById: varchar("created_by", { length: 255 })
   //   .notNull()
   //   .references(() => users.id),
+
+  subject: varchar("subject", { length: 100 })
+    .notNull()
+    .references(() => subject.name),
 
   createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
@@ -77,19 +86,19 @@ export const posts = createTable("post", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
     () => new Date(),
   ),
-  poster: varchar("poster", { length: 255 })
-    .notNull()
-    .references(() => users.username),
+  verifiedByModerator: boolean("verified_by_moderator").default(false),
 });
 
 // ─────────────────────────────
 // POST COMMENTS
 // ─────────────────────────────
 export const postComments = createTable("post_comment", {
-  id: serial("id").primaryKey(),
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   content: text("content").notNull(),
 
-  postId: integer("post_id")
+  postId: uuid("post_id")
     .notNull()
     .references(() => posts.id, { onDelete: "cascade" }),
 
@@ -150,44 +159,6 @@ export const users = createTable("user", {
   }).default(sql`CURRENT_TIMESTAMP`),
   image: varchar("image", { length: 255 }),
 });
-
-export const usersRelations = relations(users, ({ many }) => ({
-  intelSubmissions: many(intelSubmissions),
-}));
-
-export const intelSubmissions = createTable("intel_submission", {
-  id: uuid("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  poster: varchar("poster", { length: 255 })
-    .notNull()
-    .references(() => users.username),
-  title: varchar("title", { length: 255 }).notNull(),
-  content: text("content").notNull(),
-  subject: varchar("subject", { length: 100 }).notNull(),
-  examDate: timestamp("exam_date", { withTimezone: true }).notNull(),
-  difficulty: integer("difficulty").notNull(), // 1-5 scale
-  createdById: varchar("created_by", { length: 255 })
-    .notNull()
-    .references(() => users.id),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date(),
-  ),
-  verifiedByModerator: boolean("verified_by_moderator").default(false),
-});
-
-export const intelSubmissionsRelations = relations(
-  intelSubmissions,
-  ({ one }) => ({
-    author: one(users, {
-      fields: [intelSubmissions.poster],
-      references: [users.username],
-    }),
-  }),
-);
 
 export const userProfiles = createTable("user_profile", {
   userId: varchar("user_id", { length: 255 })
