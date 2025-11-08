@@ -67,7 +67,7 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-black p-8 text-red-500">
       <div className="mx-auto max-w-md">
         <div className="mb-8 rounded-lg border border-red-800 bg-gray-900 p-6">
-          <h1 className="glitch mb-6 text-center text-3xl">
+          <h1 className="glitch mb-6 whitespace-normal break-words text-center text-3xl">
             NETRUNNER REGISTRATION
           </h1>
 
@@ -145,13 +145,13 @@ export default function RegisterPage() {
               <Button
                 type="button"
                 onClick={() => router.push("/login")}
-                className="my-2 border-red-800 bg-gray-800 text-red-500 hover:bg-gray-700"
+                className="my-2 whitespace-normal break-words border-red-800 bg-gray-800 py-4 text-center text-red-500 hover:bg-gray-700"
               >
                 RETURN TO LOGIN
               </Button>
               <Button
                 type="submit"
-                className="my-2 border-red-800 bg-gray-800 text-red-500 hover:bg-gray-700"
+                className="my-2 whitespace-normal break-words border-red-800 bg-gray-800 py-4 text-center text-red-500 hover:bg-gray-700"
                 disabled={isLoading}
               >
                 {isLoading ? "INITIALIZING..." : "CREATE ACCOUNT"}
