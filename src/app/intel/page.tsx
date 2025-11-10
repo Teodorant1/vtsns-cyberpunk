@@ -15,7 +15,7 @@ export default function IntelListPage() {
   const subjectsQuery = api.post.getSubjects.useQuery();
   const intelQuery = api.intel.getLatestIntel.useQuery({
     limit,
-    subject: selectedSubject,
+    subject: selectedSubject ?? "All",
   });
 
   function toggleExpand(id: string) {
@@ -26,7 +26,9 @@ export default function IntelListPage() {
     <div className="min-h-screen bg-black p-8 text-red-500">
       <div className="mx-auto max-w-6xl">
         <h1 className="glitch mb-6 text-3xl">MEGACORP INTEL ARCHIVE</h1>
-
+        {intelQuery.error && (
+          <div className="mt-4 text-red-600">{intelQuery.error.message}</div>
+        )}
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center space-x-3">
             <label className="text-sm text-red-400">DIVISION</label>
@@ -35,7 +37,6 @@ export default function IntelListPage() {
               onChange={(e) => setSelectedSubject(e.target.value || undefined)}
               className="rounded border border-red-800 bg-gray-800 p-2 text-red-500"
             >
-              <option value="">All</option>
               {subjectsQuery.data?.map((s) => (
                 <option key={s.id} value={s.name}>
                   {s.name}
@@ -72,14 +73,14 @@ export default function IntelListPage() {
                 <header className="mb-3 flex items-start justify-between">
                   <div>
                     <h2 className="glitch mb-1 text-2xl text-white">
-                      {i.title}
+                      {i.name}
                     </h2>
-                    <div className="text-sm text-red-400">
+                    {/* <div className="text-sm text-red-400">
                       {i.subject} • Difficulty {i.difficulty}
-                    </div>
+                    </div> */}
                   </div>
                   <div className="text-right text-sm text-red-400">
-                    <div>{i.author?.username ?? "Unknown"}</div>
+                    <div>{i.poster ?? "Unknown"}</div>
                     <div>
                       {format(new Date(i.createdAt), "LLL dd, yyyy HH:mm")}
                     </div>
@@ -88,8 +89,8 @@ export default function IntelListPage() {
 
                 <div className="mb-4 text-red-300">
                   {expanded[i.id]
-                    ? i.content
-                    : `${i.content.slice(0, 300)}${i.content.length > 300 ? "..." : ""}`}
+                    ? i.text
+                    : `${i.text.slice(0, 300)}${i.text.length > 300 ? "..." : ""}`}
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -100,18 +101,20 @@ export default function IntelListPage() {
                       </span>
                     ) : (
                       <span className="rounded border border-red-700 px-2 py-1">
-                        PENDING
+                        PENDING VERIFICATION
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <Button
-                      onClick={() => toggleExpand(i.id)}
-                      className="border-red-800 bg-gray-800 text-red-500 hover:bg-gray-700"
-                    >
-                      {expanded[i.id] ? "HIDE" : "READ"}
-                    </Button>
-                  </div>
+                  {i.text.length > 300 && (
+                    <div className="flex items-center space-x-3">
+                      <Button
+                        onClick={() => toggleExpand(i.id)}
+                        className="border-red-800 bg-gray-800 text-red-500 hover:bg-gray-700"
+                      >
+                        <div>{expanded[i.id] ? "HIDE" : "READ"}</div>
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </article>
             ))}
@@ -121,7 +124,7 @@ export default function IntelListPage() {
         )}
 
         <div className="mt-8 text-center text-sm text-red-400">
-          Browse responsibly. Leaking to corp channels will get you ghosted.
+          Browse responsibly. Leaking to corp channels will get you ZEROED.
         </div>
       </div>
     </div>

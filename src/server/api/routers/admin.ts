@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { users, intelSubmissions } from "~/server/db/schema";
+import { posts, users } from "~/server/db/schema";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 
@@ -39,15 +39,16 @@ export const adminRouter = createTRPCRouter({
       throw new TRPCError({ code: "FORBIDDEN" });
     }
 
-    return ctx.db.query.intelSubmissions.findMany({
-      where: eq(intelSubmissions.verifiedByModerator, false),
+    const pending_intel = await ctx.db.query.posts.findMany({
+      where: eq(posts.verifiedByModerator, false),
       with: {
-        author: {
-          columns: { username: true, email: true, role: true },
+        comments: {
+          orderBy: (comments, { desc }) => [desc(comments.createdAt)],
         },
       },
-      limit: 200,
     });
+
+    return pending_intel ?? [];
   }),
 
   verifyIntel: protectedProcedure
@@ -58,9 +59,9 @@ export const adminRouter = createTRPCRouter({
       }
 
       await ctx.db
-        .update(intelSubmissions)
+        .update(posts)
         .set({ verifiedByModerator: true })
-        .where(eq(intelSubmissions.id, input.id));
+        .where(eq(posts.id, input.id));
 
       return { ok: true };
     }),

@@ -4,67 +4,67 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { intelSubmissions, userProfiles } from "~/server/db/schema";
-import { and, desc, eq } from "drizzle-orm";
+import { posts, userProfiles } from "~/server/db/schema";
+import { and, desc, eq, gte, lte } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 export const intelRouter = createTRPCRouter({
   submitIntel: protectedProcedure
     .input(
       z.object({
-        title: z.string().min(1).max(255),
+        name: z.string().min(1).max(255),
         content: z.string().min(1),
-        subject: z.string().min(1).max(100),
-        examDate: z.date(),
-        difficulty: z.number().min(1).max(5),
+        subject: z.string().min(1),
+        link: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      // Check if user has enough reputation (>= 10) to submit intel
-      const userProfile = await ctx.db.query.userProfiles.findFirst({
-        where: eq(userProfiles.userId, ctx.session.user.id),
-      });
+      if (!ctx.session.user.username) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+      const subjects = await ctx.db.query.subject.findMany({});
 
-      if (!userProfile || userProfile.reputation < 10) {
+      const subjectExists = subjects.some((s) => s.name === input.subject);
+
+      if (subjectExists !== true) {
         throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "Insufficient reputation to submit intel. Required: 10",
+          code: "BAD_REQUEST",
+          message: "Subject does not exist",
         });
       }
 
-      // await ctx.db.insert(intelSubmissions).values({
-      //   poster: ctx.session.user.username,
-      //   title: input.title,
-      //   content: input.content,
-      //   createdById: ctx.session.user.id,
-      // });
+      await ctx.db.insert(posts).values({
+        name: input.name,
+        text: input.content,
+        subject: input.subject,
+        poster: ctx.session.user.username,
+        link: input.link,
+      });
     }),
 
   getLatestIntel: publicProcedure
     .input(
       z.object({
-        limit: z.number().min(1).max(50).default(10),
-        subject: z.string().optional(),
+        subject: z.string(),
+        from: z.date().optional(),
+        to: z.date().optional(),
+        limit: z.number().min(1),
       }),
     )
     .query(async ({ ctx, input }) => {
-      const query = input.subject
-        ? and(eq(intelSubmissions.subject, input.subject))
-        : undefined;
-
-      return ctx.db.query.intelSubmissions.findMany({
-        where: query,
-        orderBy: [desc(intelSubmissions.createdAt)],
+      const intel_posts = await ctx.db.query.posts.findMany({
+        where: and(
+          input.subject && input.subject !== "All"
+            ? eq(posts.subject, input.subject)
+            : undefined,
+          input.from ? gte(posts.createdAt, input.from) : undefined,
+          input.to ? lte(posts.createdAt, input.to) : undefined,
+        ),
+        orderBy: [desc(posts.createdAt)],
         limit: input.limit,
-        with: {
-          author: {
-            columns: {
-              username: true,
-              image: true,
-            },
-          },
-        },
       });
+
+      return intel_posts;
     }),
 
   updateProfile: protectedProcedure

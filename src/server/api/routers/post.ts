@@ -6,7 +6,7 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import { article, jobRuns, posts, articleComments } from "~/server/db/schema";
-import { and, desc, gte, lte } from "drizzle-orm";
+import { and, desc, eq, gte, lte } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 export const postRouter = createTRPCRouter({
@@ -58,47 +58,26 @@ export const postRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      if (input.from && input.to) {
-        const input_to = addDays(input.to, 1);
-        console.log("getting latest articles");
+      const input_to = input.to ? addDays(input.to, 1) : undefined;
 
-        if (input.subject !== "All") {
-          {
-            const latestArticles2 = await ctx.db.query.article.findMany({
-              where: and(
-                gte(article.createdAt, input.from),
-                lte(article.createdAt, input_to),
-              ),
-              orderBy: (articles, { desc }) => [desc(articles.createdAt)],
-              limit: 50,
-              with: {
-                comments: {
-                  orderBy: (comments, { desc }) => [desc(comments.createdAt)],
-                },
-              },
-            });
+      const latestArticles = await ctx.db.query.article.findMany({
+        where: and(
+          input.subject && input.subject !== "All"
+            ? eq(article.subject, input.subject)
+            : undefined,
+          input.from ? gte(article.createdAt, input.from) : undefined,
+          input_to ? lte(article.createdAt, input_to) : undefined,
+        ),
+        orderBy: [desc(article.createdAt)],
+        limit: 50,
+        with: {
+          comments: {
+            orderBy: [desc(articleComments.createdAt)],
+          },
+        },
+      });
 
-            return latestArticles2;
-          }
-        } else if (input.subject === "All") {
-          const latestArticles3 = await ctx.db.query.article.findMany({
-            where: and(
-              gte(article.createdAt, input.from),
-              lte(article.createdAt, input_to),
-            ),
-
-            orderBy: (articles, { desc }) => [desc(articles.createdAt)],
-            limit: 50,
-            with: {
-              comments: {
-                orderBy: (comments, { desc }) => [desc(comments.createdAt)],
-              },
-            },
-          });
-          return latestArticles3;
-        }
-      }
-      return [];
+      return latestArticles;
     }),
   getSubjects: publicProcedure.query(async ({ ctx }) => {
     console.log("getting subjects");

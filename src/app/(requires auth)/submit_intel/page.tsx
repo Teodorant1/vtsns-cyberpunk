@@ -6,25 +6,42 @@ import { api } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
 import { useRouter } from "next/navigation";
 import AccessDenied from "~/app/access-denied/page";
+import ErrorPopup from "~/components/ui/error-popup";
 
 export default function SubmitIntelPage() {
   const { data: session } = useSession();
   const router = useRouter();
   const subjects = api.post.getSubjects.useQuery();
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [errorText, setErrorText] = useState("");
   const [formData, setFormData] = useState({
-    title: "",
+    name: "",
     content: "",
     subject: "",
-    examDate: "",
-    difficulty: 1,
+    link: "",
   });
 
   const submitIntel = api.intel.submitIntel.useMutation({
     onSuccess: () => {
-      router.push("/");
+      router.push("/intel");
+      setIsLoading(false);
+    },
+    onError: (err) => {
+      setErrorText(err.message);
+      setIsLoading(false);
+      setError(true);
     },
   });
+
+  function handle_submitIntel(e: React.FormEvent) {
+    if (isLoading) return;
+    setIsLoading(true);
+    e.preventDefault();
+    submitIntel.mutate({
+      ...formData,
+    });
+  }
 
   if (!session) {
     return <AccessDenied />;
@@ -32,18 +49,19 @@ export default function SubmitIntelPage() {
 
   return (
     <div className="min-h-screen bg-black p-8 text-red-500">
+      <ErrorPopup
+        visible={error}
+        message={errorText}
+        onClose={() => setError(false)}
+        timeout={15000}
+      />
       <div className="mx-auto max-w-4xl">
         <div className="mb-8 rounded-lg border border-red-800 bg-gray-900 p-6">
           <h1 className="glitch mb-6 text-3xl">SUBMIT MEGACORP INTEL</h1>
 
           <form
             onSubmit={(e) => {
-              e.preventDefault();
-              submitIntel.mutate({
-                ...formData,
-                examDate: new Date(formData.examDate),
-                difficulty: Number(formData.difficulty),
-              });
+              handle_submitIntel(e);
             }}
             className="space-y-6"
           >
@@ -51,13 +69,26 @@ export default function SubmitIntelPage() {
               <label className="mb-2 block text-sm">INTEL TITLE:</label>
               <input
                 type="text"
-                value={formData.title}
+                value={formData.name}
                 onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
+                  setFormData({ ...formData, name: e.target.value })
                 }
                 className="w-full rounded border border-red-800 bg-gray-800 p-2 text-red-500"
                 required
                 placeholder="e.g., ARASAKA CORP SECURITY PROTOCOLS"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm">Link:</label>
+              <input
+                type="text"
+                value={formData.link}
+                onChange={(e) =>
+                  setFormData({ ...formData, link: e.target.value })
+                }
+                className="w-full rounded border border-red-800 bg-gray-800 p-2 text-red-500"
+                placeholder="e.g., https://arasaka.net/security-protocols"
               />
             </div>
 
@@ -82,7 +113,7 @@ export default function SubmitIntelPage() {
               </select>
             </div>
 
-            <div>
+            {/* <div>
               <label className="mb-2 block text-sm">OPERATION DATE:</label>
               <input
                 type="datetime-local"
@@ -93,9 +124,9 @@ export default function SubmitIntelPage() {
                 className="w-full rounded border border-red-800 bg-gray-800 p-2 text-red-500"
                 required
               />
-            </div>
+            </div> */}
 
-            <div>
+            {/* <div>
               <label className="mb-2 block text-sm">DIFFICULTY RATING:</label>
               <select
                 value={formData.difficulty}
@@ -114,7 +145,7 @@ export default function SubmitIntelPage() {
                 <option value="4">Level 4 - Elite Defenses</option>
                 <option value="5">Level 5 - Maximum Security</option>
               </select>
-            </div>
+            </div> */}
 
             <div>
               <label className="mb-2 block text-sm">INTEL DETAILS:</label>
@@ -147,11 +178,11 @@ export default function SubmitIntelPage() {
               </Button>
             </div>
 
-            {submitIntel.error && (
+            {/* {submitIntel.error && (
               <div className="mt-4 text-red-600">
                 {submitIntel.error.message}
               </div>
-            )}
+            )} */}
           </form>
         </div>
       </div>
