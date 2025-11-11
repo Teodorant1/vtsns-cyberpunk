@@ -59,6 +59,13 @@ const LayoutHeader = () => {
           <Link href="/submit_intel" className="font-bold hover:text-red-400">
             SUBMIT_INTEL
           </Link>
+          <Link
+            href="https://multiversal-mishaps.vercel.app/about-creator"
+            className="font-bold hover:text-red-400"
+          >
+            About creator (leads to different website)
+          </Link>
+
           <div className="flex items-start space-x-6">
             {session?.user ? (
               <>
@@ -128,6 +135,12 @@ const LayoutHeader = () => {
             className="font-bold hover:text-red-400"
           >
             SUBMIT_INTEL
+          </Link>
+          <Link
+            href="https://multiversal-mishaps.vercel.app/about-creator"
+            className="font-bold hover:text-red-400"
+          >
+            About creator (leads to different website)
           </Link>
           {session?.user ? (
             <>
