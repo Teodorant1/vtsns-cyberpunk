@@ -48,12 +48,12 @@ export default function IntelListPage() {
           <div className="mt-4 text-red-600">{intelQuery.error.message}</div>
         )} */}
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center space-x-3">
+          <div className="mx-auto flex w-[150px] flex-col items-center md:w-auto md:flex-row md:space-x-3">
             <label className="text-sm text-red-400">DIVISION</label>
             <select
               value={selectedSubject ?? ""}
               onChange={(e) => setSelectedSubject(e.target.value || undefined)}
-              className="rounded border border-red-800 bg-gray-800 p-2 text-red-500"
+              className="w-auto rounded border border-red-800 bg-gray-800 p-2 text-red-500 md:w-[300px]"
             >
               {subjectsQuery.data?.map((s) => (
                 <option key={s.id} value={s.name}>
@@ -64,16 +64,16 @@ export default function IntelListPage() {
           </div>
 
           <div className="flex flex-col items-center space-x-3 md:flex-row">
-            <div>LIMIT:{limit}</div>
+            <div className="my-2">LIMIT:{limit}</div>
             <Button
               onClick={() => setLimit((l) => Math.max(6, l - 6))}
-              className="border-red-800 bg-gray-800 text-red-500 hover:bg-gray-700"
+              className="my-2 border-red-800 bg-gray-800 text-red-500 hover:bg-gray-700"
             >
               LOAD FEWER
             </Button>
             <Button
               onClick={() => setLimit((l) => l + 12)}
-              className="border-red-800 bg-gray-800 text-red-500 hover:bg-gray-700"
+              className="my-2 border-red-800 bg-gray-800 text-red-500 hover:bg-gray-700"
             >
               LOAD MORE
             </Button>
@@ -156,7 +156,7 @@ export default function IntelListPage() {
                         VERIFIED
                       </span>
                     ) : (
-                      <span className="rounded border border-red-700 px-2 py-1">
+                      <span className="rounded px-2 py-1 md:border md:border-red-700">
                         PENDING VERIFICATION
                       </span>
                     )}

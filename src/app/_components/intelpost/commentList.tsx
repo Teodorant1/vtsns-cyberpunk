@@ -32,7 +32,9 @@ export default function CommentList({ postId, comments }: CommentListProps) {
               [{new Date(comment.createdAt).toLocaleString()}]
             </span>
           </div>
-          <p className="mt-2 text-red-300">{comment.content}</p>
+          <p className="mt-2 whitespace-normal break-all text-red-300">
+            {comment.content}
+          </p>
           {session?.user?.username === comment.poster && (
             <p className="mt-1 text-xs italic text-red-700">
               Your transmission :)
