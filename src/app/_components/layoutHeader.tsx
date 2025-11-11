@@ -38,7 +38,7 @@ const LayoutHeader = () => {
         </button>
 
         {/* Desktop Navigation */}
-        <nav className="hidden space-x-6 text-2xl text-white md:ml-[10%] md:mr-[50%] md:flex">
+        <nav className="hidden flex-wrap gap-x-6 gap-y-3 text-2xl text-white md:flex md:items-center md:justify-center">
           <Link href="/" className="font-bold hover:text-red-400">
             Headlines
           </Link>
