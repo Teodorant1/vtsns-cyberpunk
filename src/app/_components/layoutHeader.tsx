@@ -115,6 +115,20 @@ const LayoutHeader = () => {
           >
             Discord
           </Link>
+          <Link
+            onClick={() => setIsOpen(false)}
+            href="/intel"
+            className="font-bold hover:text-red-400"
+          >
+            INTEL
+          </Link>
+          <Link
+            onClick={() => setIsOpen(false)}
+            href="/submit_intel"
+            className="font-bold hover:text-red-400"
+          >
+            SUBMIT_INTEL
+          </Link>
           {session?.user ? (
             <>
               <Link
