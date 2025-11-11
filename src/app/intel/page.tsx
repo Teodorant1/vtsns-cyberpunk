@@ -10,10 +10,10 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "~/components/ui/popover";
-import {
-  Calendar,
-  Calendar as CalendarComponent,
-} from "~/components/ui/calendar";
+import { Calendar } from "lucide-react";
+
+import { Calendar as CalendarComponent } from "~/components/ui/calendar";
+
 import CommentList from "../_components/intelpost/commentList";
 
 export default function IntelListPage() {
@@ -22,7 +22,7 @@ export default function IntelListPage() {
     to: addDays(new Date(), 3),
   });
   const [selectedSubject, setSelectedSubject] = useState<string | undefined>(
-    undefined,
+    "All",
   );
   const [limit, setLimit] = useState(12);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
