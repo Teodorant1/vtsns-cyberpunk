@@ -5,12 +5,18 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { article, jobRuns, posts, articleComments } from "~/server/db/schema";
+import {
+  article,
+  jobRuns,
+  posts,
+  articleComments,
+  postComments,
+} from "~/server/db/schema";
 import { and, desc, eq, gte, lte } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 export const postRouter = createTRPCRouter({
-  create_comment: protectedProcedure
+  create_comment_article: protectedProcedure
     .input(
       z.object({
         articleID: z.string().min(1),
@@ -37,6 +43,44 @@ export const postRouter = createTRPCRouter({
         }
         await ctx.db.insert(articleComments).values({
           articleId: input.articleID,
+          content: input.commentContent,
+          poster: ctx.session.user.username,
+        });
+        return { error: false, errorText: null };
+      } catch (error) {
+        if (error instanceof Error) {
+          return { error: true, errorText: error.message };
+        }
+      }
+      return { error: false, errorText: null };
+    }),
+  create_comment_post: protectedProcedure
+    .input(
+      z.object({
+        postId: z.string().min(1),
+        commentContent: z.string().min(1),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      // if (1 > 0) {
+      //   throw new TRPCError({
+      //     code: "INTERNAL_SERVER_ERROR",
+      //     message: "Simulated TRPCerror for testing purposes",
+      //   });
+      // }
+      // if (1 > 0) {
+      //   throw new Error("Simulated regular error for testing purposes");
+      // }
+
+      try {
+        if (
+          !ctx.session.user.username ||
+          typeof ctx.session.user.username !== "string"
+        ) {
+          throw new Error("Username not a string");
+        }
+        await ctx.db.insert(postComments).values({
+          postId: input.postId,
           content: input.commentContent,
           poster: ctx.session.user.username,
         });

@@ -60,6 +60,11 @@ export const intelRouter = createTRPCRouter({
           input.from ? gte(posts.createdAt, input.from) : undefined,
           input.to ? lte(posts.createdAt, input.to) : undefined,
         ),
+        with: {
+          comments: {
+            orderBy: (comments, { desc }) => [desc(comments.createdAt)],
+          },
+        },
         orderBy: [desc(posts.createdAt)],
         limit: input.limit,
       });

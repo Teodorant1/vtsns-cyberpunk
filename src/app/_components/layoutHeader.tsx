@@ -53,6 +53,12 @@ const LayoutHeader = () => {
           >
             Discord
           </Link>
+          <Link href="/intel" className="font-bold hover:text-red-400">
+            INTEL
+          </Link>
+          <Link href="/submit_intel" className="font-bold hover:text-red-400">
+            SUBMIT_INTEL
+          </Link>
           <div className="flex items-start space-x-6">
             {session?.user ? (
               <>

@@ -13,7 +13,7 @@ import { type DateRange } from "react-day-picker";
 import PaginatedList from "./_components/PaginatedList";
 import { api } from "~/trpc/react";
 import HrefLinks from "./_components/href_list";
-import CommentList from "./_components/commentList";
+import CommentList from "./_components/article/commentList";
 export default function Component() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(Date.UTC(2024, 8, 1)),

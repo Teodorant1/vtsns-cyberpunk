@@ -17,7 +17,7 @@ export default function CommentBox({ articleId }: CommentBoxProps) {
   const [success, setSuccess] = useState(false);
   const trpc = api.useUtils();
 
-  const postComment = api.post.create_comment.useMutation({
+  const postComment = api.post.create_comment_article.useMutation({
     onSuccess: async (e) => {
       setContent("");
       setSuccess(true);
