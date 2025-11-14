@@ -19,12 +19,12 @@ const LayoutHeader = () => {
           height={150}
           alt="vtsns-logo"
         />{" "}
-        <Image
+        {/* <Image
           src="/image00001.png"
           width={150}
           height={150}
           alt="vtsns-logo"
-        />
+        /> */}
         {/* <button
           className="text-white"
           onClick={() => {
