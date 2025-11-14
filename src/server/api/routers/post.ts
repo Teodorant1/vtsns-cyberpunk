@@ -12,10 +12,47 @@ import {
   articleComments,
   postComments,
 } from "~/server/db/schema";
-import { and, desc, eq, gte, lte } from "drizzle-orm";
+import { and, desc, eq, gte, lte, lt } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 export const postRouter = createTRPCRouter({
+  listByArticle: publicProcedure
+    .input(
+      z.object({
+        articleId: z.string(),
+        limit: z.number().min(1).max(100).default(50),
+        cursor: z.string().nullish(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { articleId, limit, cursor } = input;
+
+      const whereClause = cursor
+        ? and(
+            eq(articleComments.articleId, articleId),
+            lt(articleComments.createdAt, new Date(cursor)),
+          )
+        : eq(articleComments.articleId, articleId);
+
+      const items = await ctx.db.query.articleComments.findMany({
+        where: whereClause,
+        orderBy: [desc(articleComments.createdAt)],
+        limit: limit + 1,
+      });
+
+      let nextCursor: string | null = null;
+
+      if (items.length > limit) {
+        const nextItem = items.pop()!;
+        nextCursor = nextItem.createdAt.toISOString();
+      }
+
+      return {
+        items,
+        nextCursor,
+      };
+    }),
+
   create_comment_article: protectedProcedure
     .input(
       z.object({
@@ -41,6 +78,16 @@ export const postRouter = createTRPCRouter({
         ) {
           throw new Error("Username not a string");
         }
+        // const username = ctx.session.user.username;
+        // if (!username) throw new Error("Username not found");
+
+        // const comments = Array.from({ length: 500 }).map((_, i) => ({
+        //   articleId: input.articleID,
+        //   content: `${input.commentContent} #${i}`,
+        //   poster: username, // now TypeScript knows this is a string
+        // }));
+        // // Bulk insert
+        // await ctx.db.insert(articleComments).values(comments);
         await ctx.db.insert(articleComments).values({
           articleId: input.articleID,
           content: input.commentContent,
@@ -117,6 +164,7 @@ export const postRouter = createTRPCRouter({
         with: {
           comments: {
             orderBy: [desc(articleComments.createdAt)],
+            limit: 50,
           },
         },
       });

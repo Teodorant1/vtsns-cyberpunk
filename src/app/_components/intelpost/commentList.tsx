@@ -21,6 +21,8 @@ export default function CommentList({ postId, comments }: CommentListProps) {
     </div>
   ) : (
     <div className="mt-6 space-y-4">
+      <div className="m-2 p-2">THE LATEST 50 COMMENTS</div>
+
       {comments.map((comment) => (
         <div
           key={comment.id}

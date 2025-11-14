@@ -14,12 +14,17 @@ const LayoutHeader = () => {
     <header className="border-b border-red-800 bg-black p-4">
       <div className="flex items-start justify-between">
         <Image
+          src="/2e6e40bc-e973-4852-9890-938346d174d4.png"
+          width={150}
+          height={150}
+          alt="vtsns-logo"
+        />{" "}
+        <Image
           src="/image00001.png"
           width={150}
           height={150}
           alt="vtsns-logo"
         />
-
         {/* <button
           className="text-white"
           onClick={() => {
@@ -28,7 +33,6 @@ const LayoutHeader = () => {
         >
           PRINT SESSION
         </button> */}
-
         {/* Mobile Menu Toggle */}
         <button
           className="text-white focus:outline-none md:hidden"
@@ -36,7 +40,6 @@ const LayoutHeader = () => {
         >
           {isOpen ? <X size={32} /> : <Menu size={32} />}
         </button>
-
         {/* Desktop Navigation */}
         <nav className="hidden flex-wrap gap-x-6 gap-y-3 text-2xl text-white md:flex md:items-center md:justify-center">
           <Link href="/" className="font-bold hover:text-red-400">
