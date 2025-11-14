@@ -2,10 +2,6 @@ import React from "react";
 import AccessDenied from "../access-denied/page";
 import { type Metadata } from "next";
 import { getServerAuthSession } from "~/server/auth";
-import { GeistSans } from "geist/font/sans";
-import { TRPCReactProvider } from "~/trpc/react";
-import LayoutHeader from "../_components/layoutHeader";
-import { NextAuthProvider } from "../_components/providers/SessionProvider";
 
 export const metadata: Metadata = {
   title: "VTSNS-CYBERPUNK-NEWS",
@@ -20,15 +16,5 @@ export default async function Layout({
   if (!session) {
     return <AccessDenied />;
   }
-  return (
-    <html lang="en" className={`${GeistSans.variable}`}>
-      <body>
-        <div className="scanline" />
-        <NextAuthProvider session={session}>
-          <LayoutHeader />
-          <TRPCReactProvider>{children}</TRPCReactProvider>
-        </NextAuthProvider>
-      </body>
-    </html>
-  );
+  return <>{children}</>;
 }

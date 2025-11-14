@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { api } from "~/trpc/react";
 import { useSession } from "next-auth/react";
 import CommentBox from "./commentBox";
@@ -7,21 +8,24 @@ import CommentBox from "./commentBox";
 export default function MoreComments({ articleId }: { articleId: string }) {
   const { data: session } = useSession();
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
-    api.post.listByArticle.useInfiniteQuery(
-      {
-        articleId,
-        limit: 50,
-      },
-      {
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-      },
-    );
+  // local cursors
+  const [cursor, setCursor] = useState<string | null>(null); // NEXT page
+  const [reverseCursor, setReverseCursor] = useState<string | null>(null); // PREV page
+
+  const { data, status } = api.post.listByArticle.useQuery(
+    {
+      articleId,
+      limit: 50,
+      cursor,
+      reverseCursor,
+    },
+    {
+      placeholderData: (prev) => prev,
+    },
+  );
 
   if (status === "pending") {
-    return (
-      <div className="p-4 text-red-500">LOADING ADDITIONAL TRANSMISSIONS…</div>
-    );
+    return <div className="p-4 text-red-500">LOADING TRANSMISSIONS…</div>;
   }
   if (status === "error") {
     return (
@@ -31,24 +35,22 @@ export default function MoreComments({ articleId }: { articleId: string }) {
     );
   }
 
-  if (!data || data.pages.length === 0) {
-    return (
-      <div className="space-y-4">
-        <p className="border border-red-800 p-2 italic text-red-700">
-          NO MORE SIGNALS…
-        </p>
-        {session && <CommentBox articleId={articleId} />}
-      </div>
-    );
-  }
+  // if (!data || data.items.length === 0) {
+  //   return (
+  //     <div className="space-y-4">
+  //       <p className="border border-red-800 p-2 italic text-red-700">
+  //         NO SIGNALS…
+  //       </p>
+  //       {session && <CommentBox articleId={articleId} />}
+  //     </div>
+  //   );
+  // }
 
-  const comments = data.pages.flatMap((page) => page.items);
+  const { items, nextCursor, prevCursor } = data;
 
   return (
     <div className="mt-6 space-y-4">
-      <div className="m-2 p-2">FULL COMMENT LOG (PAGINATED)</div>
-
-      {comments.map((comment) => (
+      {items.map((comment) => (
         <div
           key={comment.id}
           className="rounded-lg border border-red-800 bg-gray-900 p-3"
@@ -72,15 +74,30 @@ export default function MoreComments({ articleId }: { articleId: string }) {
         </div>
       ))}
 
-      {hasNextPage && (
+      {/* Pagination Controls */}
+      <div className="flex justify-between p-2">
         <button
-          onClick={() => fetchNextPage()}
-          disabled={isFetchingNextPage}
-          className="border border-red-700 bg-black px-4 py-2 text-red-400 hover:bg-red-950"
+          disabled={!prevCursor}
+          onClick={() => {
+            setCursor(null);
+            setReverseCursor(prevCursor);
+          }}
+          className="border border-red-700 bg-black px-4 py-2 text-red-400 hover:bg-red-950 disabled:opacity-30"
         >
-          {isFetchingNextPage ? "RETRIEVING..." : "LOAD MORE SIGNALS"}
+          ← PREVIOUS
         </button>
-      )}
+
+        <button
+          disabled={!nextCursor}
+          onClick={() => {
+            setReverseCursor(null);
+            setCursor(nextCursor);
+          }}
+          className="border border-red-700 bg-black px-4 py-2 text-red-400 hover:bg-red-950 disabled:opacity-30"
+        >
+          NEXT →
+        </button>
+      </div>
 
       {session && <CommentBox articleId={articleId} />}
     </div>

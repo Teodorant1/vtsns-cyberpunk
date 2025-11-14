@@ -41,7 +41,7 @@ const LayoutHeader = () => {
           {isOpen ? <X size={32} /> : <Menu size={32} />}
         </button>
         {/* Desktop Navigation */}
-        <nav className="hidden flex-wrap gap-x-6 gap-y-3 text-2xl text-white md:flex md:items-center md:justify-center">
+        <nav className="mx-auto my-auto hidden flex-wrap gap-x-6 gap-y-3 text-2xl text-white md:flex md:items-center md:justify-center">
           <Link href="/" className="font-bold hover:text-red-400">
             Headlines
           </Link>

@@ -12,7 +12,7 @@ import {
   articleComments,
   postComments,
 } from "~/server/db/schema";
-import { and, desc, eq, gte, lte, lt } from "drizzle-orm";
+import { and, desc, eq, gte, lte, lt, gt, asc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 export const postRouter = createTRPCRouter({
@@ -20,37 +20,119 @@ export const postRouter = createTRPCRouter({
     .input(
       z.object({
         articleId: z.string(),
-        limit: z.number().min(1).max(100).default(50),
-        cursor: z.string().nullish(),
+        limit: z.number().default(50),
+        cursor: z.string().nullish(), // forward pagination
+        reverseCursor: z.string().nullish(), // backward pagination
       }),
     )
     .query(async ({ ctx, input }) => {
-      const { articleId, limit, cursor } = input;
+      const { articleId, limit, cursor, reverseCursor } = input;
 
-      const whereClause = cursor
-        ? and(
+      // ----------------------------
+      // FORWARD PAGINATION (next page)
+      // ----------------------------
+      if (cursor && !reverseCursor) {
+        const items = await ctx.db.query.articleComments.findMany({
+          where: and(
             eq(articleComments.articleId, articleId),
             lt(articleComments.createdAt, new Date(cursor)),
-          )
-        : eq(articleComments.articleId, articleId);
+          ),
+          orderBy: [desc(articleComments.createdAt)],
+          limit: limit + 1,
+        });
 
+        let nextCursor: string | null = null;
+        let prevCursor: string | null = null;
+
+        // determine forward cursor
+        if (items.length > limit) {
+          const nextItem = items.pop()!;
+          nextCursor = nextItem.createdAt.toISOString();
+        }
+
+        // determine backward cursor (previous page)
+        if (items.length > 0) {
+          const prevItem = items[0];
+          if (!prevItem) {
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Previous item not found",
+            });
+          }
+          prevCursor = prevItem.createdAt.toISOString();
+        }
+
+        return { items, nextCursor, prevCursor };
+      }
+
+      // ----------------------------
+      // BACKWARD PAGINATION (previous page)
+      // ----------------------------
+      if (reverseCursor && !cursor) {
+        const items = await ctx.db.query.articleComments.findMany({
+          where: and(
+            eq(articleComments.articleId, articleId),
+            gt(articleComments.createdAt, new Date(reverseCursor)),
+          ),
+          orderBy: [asc(articleComments.createdAt)], // reverse order first
+          limit: limit + 1,
+        });
+
+        let nextCursor: string | null = null;
+        let prevCursor: string | null = null;
+
+        if (items.length > limit) {
+          const lastExtra = items.pop()!;
+          prevCursor = lastExtra.createdAt.toISOString();
+        }
+
+        // flip list back to newest → oldest order
+        items.reverse();
+
+        // forward cursor from newest item
+        if (items.length > 0) {
+          if (!items?.[items.length - 1]) {
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Last item not found",
+            });
+          }
+          const lastItem = items[items.length - 1]!;
+          nextCursor = lastItem.createdAt.toISOString();
+        }
+
+        return { items, nextCursor, prevCursor };
+      }
+
+      // ----------------------------
+      // FIRST PAGE (no cursors)
+      // ----------------------------
       const items = await ctx.db.query.articleComments.findMany({
-        where: whereClause,
+        where: eq(articleComments.articleId, articleId),
         orderBy: [desc(articleComments.createdAt)],
         limit: limit + 1,
       });
 
       let nextCursor: string | null = null;
+      let prevCursor: string | null = null;
 
       if (items.length > limit) {
         const nextItem = items.pop()!;
         nextCursor = nextItem.createdAt.toISOString();
       }
 
-      return {
-        items,
-        nextCursor,
-      };
+      if (items.length > 0) {
+        const prevItem = items[0];
+        if (!prevItem) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Previous item not found",
+          });
+        }
+        prevCursor = prevItem.createdAt.toISOString();
+      }
+
+      return { items, nextCursor, prevCursor };
     }),
 
   create_comment_article: protectedProcedure
