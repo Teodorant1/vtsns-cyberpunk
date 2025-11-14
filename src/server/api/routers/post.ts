@@ -81,11 +81,14 @@ export const postRouter = createTRPCRouter({
         // const username = ctx.session.user.username;
         // if (!username) throw new Error("Username not found");
 
+        // // Backend: add 1ms per comment during test insertion
         // const comments = Array.from({ length: 500 }).map((_, i) => ({
         //   articleId: input.articleID,
         //   content: `${input.commentContent} #${i}`,
-        //   poster: username, // now TypeScript knows this is a string
+        //   poster: username,
+        //   createdAt: new Date(Date.now() - i * 500), // ensures unique timestamp
         // }));
+
         // // Bulk insert
         // await ctx.db.insert(articleComments).values(comments);
         await ctx.db.insert(articleComments).values({
