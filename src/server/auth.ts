@@ -44,7 +44,6 @@ export const authOptions: NextAuthOptions = {
     // Persist custom fields to the token on sign in
     jwt: async ({ token, user: maybeUser }) => {
       const user = maybeUser as unknown as AuthUser | undefined;
-      console.log("JWT callback invoked. Token:", token, "User:", user);
       if (user) {
         // user comes from authorize result
         token.id = user.id;

@@ -8,29 +8,131 @@ import {
 import {
   article,
   jobRuns,
-  posts,
   articleComments,
   postComments,
 } from "~/server/db/schema";
 import { and, desc, eq, gte, lte, lt, gt, asc } from "drizzle-orm";
-import { TRPCError } from "@trpc/server";
 
 export const postRouter = createTRPCRouter({
-  listByArticle: publicProcedure
+  list_comments_By_Post: publicProcedure
+    .input(
+      z.object({
+        postID: z.string(),
+        limit: z.number().default(50),
+        cursor: z.string().nullish(), // forward
+        reverseCursor: z.string().nullish(), // backward
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { postID, limit, cursor, reverseCursor } = input;
+      console.log("list_comments_By_Post postID", input.postID);
+
+      // ============================================================
+      // FORWARD PAGINATION (cursor)
+      // ============================================================
+      if (cursor && !reverseCursor) {
+        const items = await ctx.db.query.postComments.findMany({
+          where: and(
+            eq(postComments.postId, postID),
+            lt(postComments.createdAt, new Date(cursor)),
+          ),
+          orderBy: [desc(postComments.createdAt)],
+          limit: limit + 1,
+        });
+
+        if (items.length === 0) {
+          return { items: [], nextCursor: null, prevCursor: cursor };
+        }
+
+        let nextCursor: string | null = null;
+        let prevCursor: string | null = null;
+
+        // determine forward cursor
+        if (items.length > limit) {
+          const extra = items.pop()!;
+          nextCursor = extra.createdAt.toISOString();
+        }
+
+        // determine backward cursor only if NOT the first page
+        if (items.length > 0) {
+          prevCursor = items[0]!.createdAt.toISOString();
+        }
+
+        return { items, nextCursor, prevCursor };
+      }
+
+      // ============================================================
+      // BACKWARD PAGINATION (reverseCursor)
+      // ============================================================
+      if (reverseCursor && !cursor) {
+        const raw = await ctx.db.query.postComments.findMany({
+          where: and(
+            eq(postComments.postId, postID),
+            gt(postComments.createdAt, new Date(reverseCursor)),
+          ),
+          orderBy: [asc(postComments.createdAt)],
+          limit: limit + 1,
+        });
+
+        if (raw.length === 0) {
+          return { items: [], nextCursor: reverseCursor, prevCursor: null };
+        }
+
+        let nextCursor: string | null = null;
+        let prevCursor: string | null = null;
+
+        // remove boundary overflow
+        if (raw.length > limit) {
+          const extra = raw.pop()!;
+          prevCursor = extra.createdAt.toISOString();
+        }
+
+        // newest → oldest
+        raw.reverse();
+
+        // next cursor (forward)
+        nextCursor = raw[raw.length - 1]!.createdAt.toISOString();
+
+        return { items: raw, nextCursor, prevCursor };
+      }
+
+      // ============================================================
+      // FIRST PAGE (no cursors)
+      // ============================================================
+      const items = await ctx.db.query.postComments.findMany({
+        where: eq(postComments.postId, postID),
+        orderBy: [desc(postComments.createdAt)],
+        limit: limit + 1,
+      });
+
+      let nextCursor: string | null = null;
+
+      if (items.length > limit) {
+        const extra = items.pop()!;
+        nextCursor = extra.createdAt.toISOString();
+      }
+
+      // VERY IMPORTANT:
+      // First page should NEVER have a prevCursor
+      const prevCursor: string | null = null;
+
+      return { items, nextCursor, prevCursor };
+    }),
+  list_comments_By_Article: publicProcedure
     .input(
       z.object({
         articleId: z.string(),
         limit: z.number().default(50),
-        cursor: z.string().nullish(), // forward pagination
-        reverseCursor: z.string().nullish(), // backward pagination
+        cursor: z.string().nullish(), // forward
+        reverseCursor: z.string().nullish(), // backward
       }),
     )
     .query(async ({ ctx, input }) => {
       const { articleId, limit, cursor, reverseCursor } = input;
 
-      // ----------------------------
-      // FORWARD PAGINATION (next page)
-      // ----------------------------
+      // ============================================================
+      // FORWARD PAGINATION (cursor)
+      // ============================================================
       if (cursor && !reverseCursor) {
         const items = await ctx.db.query.articleComments.findMany({
           where: and(
@@ -41,72 +143,65 @@ export const postRouter = createTRPCRouter({
           limit: limit + 1,
         });
 
+        if (items.length === 0) {
+          return { items: [], nextCursor: null, prevCursor: cursor };
+        }
+
         let nextCursor: string | null = null;
         let prevCursor: string | null = null;
 
         // determine forward cursor
         if (items.length > limit) {
-          const nextItem = items.pop()!;
-          nextCursor = nextItem.createdAt.toISOString();
+          const extra = items.pop()!;
+          nextCursor = extra.createdAt.toISOString();
         }
 
-        // determine backward cursor (previous page)
+        // determine backward cursor only if NOT the first page
         if (items.length > 0) {
-          const prevItem = items[0];
-          if (!prevItem) {
-            throw new TRPCError({
-              code: "INTERNAL_SERVER_ERROR",
-              message: "Previous item not found",
-            });
-          }
-          prevCursor = prevItem.createdAt.toISOString();
+          prevCursor = items[0]!.createdAt.toISOString();
         }
 
         return { items, nextCursor, prevCursor };
       }
 
-      // ----------------------------
-      // BACKWARD PAGINATION (previous page)
-      // ----------------------------
+      // ============================================================
+      // BACKWARD PAGINATION (reverseCursor)
+      // ============================================================
       if (reverseCursor && !cursor) {
-        const items = await ctx.db.query.articleComments.findMany({
+        const raw = await ctx.db.query.articleComments.findMany({
           where: and(
             eq(articleComments.articleId, articleId),
             gt(articleComments.createdAt, new Date(reverseCursor)),
           ),
-          orderBy: [asc(articleComments.createdAt)], // reverse order first
+          orderBy: [asc(articleComments.createdAt)],
           limit: limit + 1,
         });
+
+        if (raw.length === 0) {
+          return { items: [], nextCursor: reverseCursor, prevCursor: null };
+        }
 
         let nextCursor: string | null = null;
         let prevCursor: string | null = null;
 
-        if (items.length > limit) {
-          const lastExtra = items.pop()!;
-          prevCursor = lastExtra.createdAt.toISOString();
+        // remove boundary overflow
+        if (raw.length > limit) {
+          const extra = raw.pop()!;
+          prevCursor = extra.createdAt.toISOString();
         }
 
-        // flip list back to newest → oldest order
-        items.reverse();
+        // newest → oldest
+        raw.reverse();
 
-        // forward cursor from newest item
-        if (items.length > 0) {
-          if (!items?.[items.length - 1]) {
-            throw new TRPCError({
-              code: "INTERNAL_SERVER_ERROR",
-              message: "Last item not found",
-            });
-          }
-          const lastItem = items[items.length - 1]!;
-          nextCursor = lastItem.createdAt.toISOString();
-        }
+        // next cursor (forward)
+        nextCursor = raw[raw.length - 1]!.createdAt.toISOString();
 
-        return { items, nextCursor, prevCursor };
+        return { items: raw, nextCursor, prevCursor };
       }
 
-      // ----------------------------
+      // ============================================================
       // FIRST PAGE (no cursors)
-      // ----------------------------
+      // ============================================================
       const items = await ctx.db.query.articleComments.findMany({
         where: eq(articleComments.articleId, articleId),
         orderBy: [desc(articleComments.createdAt)],
@@ -114,27 +209,18 @@ export const postRouter = createTRPCRouter({
       });
 
       let nextCursor: string | null = null;
-      let prevCursor: string | null = null;
 
       if (items.length > limit) {
-        const nextItem = items.pop()!;
-        nextCursor = nextItem.createdAt.toISOString();
+        const extra = items.pop()!;
+        nextCursor = extra.createdAt.toISOString();
       }
 
-      if (items.length > 0) {
-        const prevItem = items[0];
-        if (!prevItem) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Previous item not found",
-          });
-        }
-        prevCursor = prevItem.createdAt.toISOString();
-      }
+      // VERY IMPORTANT:
+      // First page should NEVER have a prevCursor
+      const prevCursor: string | null = null;
 
       return { items, nextCursor, prevCursor };
     }),
-
   create_comment_article: protectedProcedure
     .input(
       z.object({
@@ -160,8 +246,8 @@ export const postRouter = createTRPCRouter({
         ) {
           throw new Error("Username not a string");
         }
-        // const username = ctx.session.user.username;
-        // if (!username) throw new Error("Username not found");
+        const username = ctx.session.user.username;
+        if (!username) throw new Error("Username not found");
 
         // // Backend: add 1ms per comment during test insertion
         // const comments = Array.from({ length: 500 }).map((_, i) => ({
@@ -172,12 +258,19 @@ export const postRouter = createTRPCRouter({
         // }));
 
         // // Bulk insert
-        // await ctx.db.insert(articleComments).values(comments);
-        await ctx.db.insert(articleComments).values({
-          articleId: input.articleID,
-          content: input.commentContent,
-          poster: ctx.session.user.username,
-        });
+        // const inserted_comments = await ctx.db
+        //   .insert(articleComments)
+        //   .values(comments);
+        // await ctx.db
+        //   .insert(articleComments)
+        //   .values({
+        //     articleId: input.articleID,
+        //     content: input.commentContent,
+        //     poster: ctx.session.user.username,
+        //   })
+        //   .returning();
+
+        // console.log("Inserted comments length:", inserted_comments.length);
         return { error: false, errorText: null };
       } catch (error) {
         if (error instanceof Error) {
@@ -211,6 +304,26 @@ export const postRouter = createTRPCRouter({
         ) {
           throw new Error("Username not a string");
         }
+
+        const username = ctx.session.user.username;
+        if (!username) throw new Error("Username not found");
+
+        // // Backend: add 1ms per comment during test insertion
+        // const comments = Array.from({ length: 500 }).map((_, i) => ({
+        //   postId: input.postId,
+        //   content: `${input.commentContent} #${i}`,
+        //   poster: username,
+        //   createdAt: new Date(Date.now() - i * 500), //ensures unique timestamp
+        // }));
+
+        // //  Bulk insert
+        // const cormac_comments = await ctx.db
+        //   .insert(postComments)
+        //   .values(comments)
+        //   .returning();
+
+        // console.log("Inserted comments length:", cormac_comments.length);
+
         await ctx.db.insert(postComments).values({
           postId: input.postId,
           content: input.commentContent,

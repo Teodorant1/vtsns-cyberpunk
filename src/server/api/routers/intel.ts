@@ -63,6 +63,7 @@ export const intelRouter = createTRPCRouter({
         with: {
           comments: {
             orderBy: (comments, { desc }) => [desc(comments.createdAt)],
+            limit: 50,
           },
         },
         orderBy: [desc(posts.createdAt)],

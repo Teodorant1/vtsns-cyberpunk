@@ -5,16 +5,16 @@ import { api } from "~/trpc/react";
 import { useSession } from "next-auth/react";
 import CommentBox from "./commentBox";
 
-export default function MoreComments({ articleId }: { articleId: string }) {
+export default function MoreComments({ postID }: { postID: string }) {
   const { data: session } = useSession();
 
   // local cursors
   const [cursor, setCursor] = useState<string | null>(null); // NEXT page
   const [reverseCursor, setReverseCursor] = useState<string | null>(null); // PREV page
 
-  const { data, status } = api.post.list_comments_By_Article.useQuery(
+  const { data, status } = api.post.list_comments_By_Post.useQuery(
     {
-      articleId,
+      postID,
       limit: 50,
       cursor,
       reverseCursor,
@@ -41,7 +41,7 @@ export default function MoreComments({ articleId }: { articleId: string }) {
   //       <p className="border border-red-800 p-2 italic text-red-700">
   //         NO SIGNALS…
   //       </p>
-  //       {session && <CommentBox articleId={articleId} />}
+  //       {session && <CommentBox postID={postID} />}
   //     </div>
   //   );
   // }
@@ -53,7 +53,6 @@ export default function MoreComments({ articleId }: { articleId: string }) {
     return (
       <div className="mt-6 space-y-4">
         <p className="text-red-500">NO MORE COMMENTS IN THIS DIRECTION…</p>
-
         <div className="flex justify-between p-2">
           <button
             disabled={!prevCursor}
@@ -77,8 +76,7 @@ export default function MoreComments({ articleId }: { articleId: string }) {
             NEXT →
           </button>
         </div>
-
-        {session && <CommentBox articleId={articleId} />}
+        {session && <CommentBox postId={postID} />}
       </div>
     );
   }
@@ -134,7 +132,7 @@ export default function MoreComments({ articleId }: { articleId: string }) {
         </button>
       </div>
 
-      {session && <CommentBox articleId={articleId} />}
+      {session && <CommentBox postId={postID} />}
     </div>
   );
 }
