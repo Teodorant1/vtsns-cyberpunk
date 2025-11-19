@@ -200,7 +200,7 @@ export default function Component() {
                 className="overflow-hidden rounded-lg border border-red-800 bg-gray-900 p-6 transition-shadow hover:shadow-lg hover:shadow-red-500/20"
               >
                 <h3 className="glitch mb-2 text-2xl font-semibold text-white">
-                  {article.subject} - {article.title}
+                  {article.title}
                 </h3>
                 <div className="mb-4 flex items-center space-x-4">
                   <div className="flex items-center">
