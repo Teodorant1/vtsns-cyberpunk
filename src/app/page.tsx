@@ -79,6 +79,18 @@ export default function Component() {
     <div className="min-h-screen bg-black text-red-500">
       <main className="container mx-auto py-8">
         <div className="mb-6 flex items-center justify-between"></div>
+        {articles.error && (
+          <div className="">
+            articlesQUERY ERROR: {articles.error.message} , please contact the
+            administrator!
+          </div>
+        )}
+        {categories.error && (
+          <div className="">
+            categoriesQUERY ERROR: {categories.error.message} , please contact
+            the administrator!
+          </div>
+        )}
         {categories.data ? (
           <div>
             <PaginatedList
