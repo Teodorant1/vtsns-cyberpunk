@@ -10,6 +10,7 @@ import {
   jobRuns,
   articleComments,
   postComments,
+  subject,
 } from "~/server/db/schema";
 import { and, desc, eq, gte, lte, lt, gt, asc } from "drizzle-orm";
 
@@ -372,7 +373,9 @@ export const postRouter = createTRPCRouter({
   getSubjects: publicProcedure.query(async ({ ctx }) => {
     console.log("getting subjects");
 
-    const subjects = await ctx.db.query.subject.findMany({});
+    const subjects = await ctx.db.query.subject.findMany({
+      orderBy: [asc(subject.name)],
+    });
 
     const subjects_with_all = [{ name: "All", id: -1 }, ...subjects];
 
