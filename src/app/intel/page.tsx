@@ -53,7 +53,7 @@ export default function IntelListPage() {
             <select
               value={selectedSubject ?? ""}
               onChange={(e) => setSelectedSubject(e.target.value || undefined)}
-              className="w-auto rounded border border-red-800 bg-gray-800 p-2 text-red-500 md:w-[300px]"
+              className="w-full rounded border border-red-800 bg-gray-800 p-2 text-red-500"
             >
               {subjectsQuery.data?.map((s) => (
                 <option key={s.id} value={s.name}>

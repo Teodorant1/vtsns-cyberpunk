@@ -173,23 +173,7 @@ export async function shouldRunJob() {
 export async function scrape_vtsns_CRONJOB() {
   const article_page = await scrape_Predmeti_info();
   await upsertArticle(article_page);
-  //  for (let i = 0; i < article_page.length; i++) {
-  //   const new_hreflinks = [
-  //     ...article_page[i]!.article.hrefLinks,
-  //     article_page[i]!.href,
-  //   ];
 
-  //   await upsertArticle(
-  //     article_page[i]!.title_analysis.title,
-  //     article_page[i]!.title_analysis.subject,
-  //     article_page[i]!.href_title_date,
-  //     article_page[i]!.article.combinedText,
-  //     article_page[i]!.title_analysis.is_general_announcement,
-  //     article_page[i]!.date!,
-  //     article_page[i]!.href,
-  //     new_hreflinks ?? [],
-  //   );.title_analysis.is_general_announcement === false
-  // if (article_page[i]!.title. === false) {
   await upsertSubject(article_page);
   //  }
   // }
