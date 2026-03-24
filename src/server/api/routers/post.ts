@@ -262,16 +262,16 @@ export const postRouter = createTRPCRouter({
         // const inserted_comments = await ctx.db
         //   .insert(articleComments)
         //   .values(comments);
-        // await ctx.db
-        //   .insert(articleComments)
-        //   .values({
-        //     articleId: input.articleID,
-        //     content: input.commentContent,
-        //     poster: ctx.session.user.username,
-        //   })
-        //   .returning();
+         await ctx.db
+        .insert(articleComments)
+           .values({
+           articleId: input.articleID,
+           content: input.commentContent,
+            poster: ctx.session.user.username,
+           })
+           .returning();
 
-        // console.log("Inserted comments length:", inserted_comments.length);
+         console.log("Inserted comments length:", inserted_comments.length);
         return { error: false, errorText: null };
       } catch (error) {
         if (error instanceof Error) {
