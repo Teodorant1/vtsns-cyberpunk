@@ -1,3 +1,5 @@
+"use server";
+
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 /* eslint-disable @typescript-eslint/prefer-for-of */
@@ -169,7 +171,31 @@ export async function shouldRunJob() {
 
   return minutesDifference >= 50;
 }
+// export async function get_class_schedule() {
+//   const url = "https://vtsns.edu.rs/raspored-nastave-osnovne-studije/";
+//   const { body } = await got(url);
+//   const $ = load(body);
+//   console.log("Raspored nastave:");
+//   const hrefArray: { href: string; text: string }[] = [];
 
+//   $("#main > div > div.column.column-wide.column-last").each(
+//     (index, element) => {
+//       const text = $(element).text().trim();
+//       console.log("text:", text);
+
+//       $(element)
+//         .find("li a")
+//         .each((i, link) => {
+//           const href = $(link).attr("href");
+//           const linkText = $(link).text().trim();
+//           if (href) {
+//             hrefArray.push({ href, text: linkText });
+//           }
+//         });
+//     },
+//   );
+//   console.log("Extracted hrefs:", hrefArray);
+// }
 export async function scrape_vtsns_CRONJOB() {
   const article_page = await scrape_Predmeti_info();
   await upsertArticle(article_page);

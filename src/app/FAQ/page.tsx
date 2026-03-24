@@ -1,8 +1,7 @@
 // FAQPage.tsx
 "use client";
 import { useState } from "react";
-import { Clock } from "lucide-react";
-
+// import { get_class_schedule } from "~/utilities/random-functions";
 export default function FAQPage() {
   const [activeQuestion, setActiveQuestion] = useState<string | null>(null);
 
@@ -38,18 +37,30 @@ export default function FAQPage() {
     },
   ];
 
+  // async function scrape_raspored() {
+  //   await get_class_schedule();
+  // }
+
   return (
     <div className="min-h-screen bg-black text-red-500">
       <main className="container mx-auto py-8">
         <h1 className="glitch mb-8 flex items-center text-3xl font-bold text-white">
           Web Scraping{" "}
-          <h1
+          <div
             className="glitch mx-5 flex text-2xl font-bold tracking-wider text-red-600"
             style={{ textShadow: "2px 2px 4px rgba(255,0,0,0.5)" }}
           >
             FAQ
-          </h1>
+          </div>
         </h1>
+        {/* <button
+          onClick={async () => {
+            await scrape_raspored();
+          }}
+        >
+          {" "}
+          Test{" "}
+        </button> */}
         <section className="space-y-6">
           {faqs.map((faq) => (
             <div
