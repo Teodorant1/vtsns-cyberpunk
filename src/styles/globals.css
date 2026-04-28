@@ -6,52 +6,55 @@
     --radius: 0.5rem;
   }
 }
-
 @keyframes glitch {
-  0% {
-    text-shadow:
-      0.32em 0 0 rgba(255, 0, 0, 0.75),
-      -0.32em -0.025em 0 rgba(0, 255, 0, 0.75),
-      -0.025em 0.32em 0 rgba(0, 0, 255, 0.75);
-  }
-  14% {
-    text-shadow:
-      0.32em 0 0 rgba(255, 0, 0, 0.75),
-      -0.32em -0.025em 0 rgba(0, 255, 0, 0.75),
-      -0.025em 0.32em 0 rgba(0, 0, 255, 0.75);
+  0%, 100% {
+    text-shadow: 
+      0.05em 0 0 rgba(255, 0, 0, 0.75),
+      -0.025em -0.05em 0 rgba(0, 255, 0, 0.75),
+      0.025em 0.05em 0 rgba(0, 0, 255, 0.75);
   }
   15% {
-    text-shadow:
-      -0.32em -0.025em 0 rgba(255, 0, 0, 0.75),
+    text-shadow: 
+      -0.05em -0.025em 0 rgba(255, 0, 0, 0.75),
       0.025em 0.025em 0 rgba(0, 255, 0, 0.75),
-      -0.32em -0.32em 0 rgba(0, 0, 255, 0.75);
+      -0.05em -0.05em 0 rgba(0, 0, 255, 0.75);
   }
-  49% {
-    text-shadow:
-      -0.32em -0.025em 0 rgba(255, 0, 0, 0.75),
-      0.025em 0.025em 0 rgba(0, 255, 0, 0.75),
-      -0.32em -0.32em 0 rgba(0, 0, 255, 0.75);
+  30% {
+    text-shadow: 
+      0.025em 0.05em 0 rgba(255, 0, 0, 0.75),
+      0.05em 0 0 rgba(0, 255, 0, 0.75),
+      0 -0.05em 0 rgba(0, 0, 255, 0.75);
   }
-  50% {
-    text-shadow:
-      0.025em 0.32em 0 rgba(255, 0, 0, 0.75),
-      0.32em 0 0 rgba(0, 255, 0, 0.75),
-      0 -0.32em 0 rgba(0, 0, 255, 0.75);
-  }
-  99% {
-    text-shadow:
-      0.025em 0.32em 0 rgba(255, 0, 0, 0.75),
-      0.32em 0 0 rgba(0, 255, 0, 0.75),
-      0 -0.32em 0 rgba(0, 0, 255, 0.75);
-  }
-  100% {
-    text-shadow:
-      -0.025em 0 0 rgba(255, 0, 0, 0.75),
+  45% {
+    text-shadow: 
+      -0.05em 0 0 rgba(255, 0, 0, 0.75),
       -0.025em -0.025em 0 rgba(0, 255, 0, 0.75),
-      -0.025em -0.32em 0 rgba(0, 0, 255, 0.75);
+      -0.025em -0.05em 0 rgba(0, 0, 255, 0.75);
+  }
+  60% {
+    text-shadow: 
+      0.025em 0.05em 0 rgba(255, 0, 0, 0.75),
+      -0.05em 0.025em 0 rgba(0, 255, 0, 0.75),
+      0.05em -0.025em 0 rgba(0, 0, 255, 0.75);
+  }
+  75% {
+    text-shadow: 
+      -0.025em -0.05em 0 rgba(255, 0, 0, 0.75),
+      -0.025em 0.05em 0 rgba(0, 255, 0, 0.75),
+      0.05em 0.025em 0 rgba(0, 0, 255, 0.75);
+  }
+  90% {
+    text-shadow: 
+      0.05em -0.025em 0 rgba(255, 0, 0, 0.75),
+      -0.05em -0.025em 0 rgba(0, 255, 0, 0.75),
+      -0.025em -0.05em 0 rgba(0, 0, 255, 0.75);
   }
 }
 
+/* Apply this to your element */
+.glitch-text {
+  animation: glitch 500ms linear infinite;
+}
 .glitch {
   animation: glitch 1s linear infinite;
 }
