@@ -6,7 +6,7 @@
     --radius: 0.5rem;
   }
 }
-@keyframes glitch-split {
+@keyframes glitch {
   0% {
     text-shadow: 
        0.15em  0.05em 0 rgba(255, 0, 0, 0.75),
