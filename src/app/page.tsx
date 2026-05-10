@@ -42,7 +42,16 @@ export default function Component() {
     setIsLoading(boolean);
     setIsLoading_button(string);
   }
-
+  function set_date_range_to_current_month() {
+    const now = new Date();
+    const firstDayOfMonth = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1),
+    );
+    const lastDayOfMonth = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0),
+    );
+    setDateRange({ from: firstDayOfMonth, to: lastDayOfMonth });
+  }
   function calculate_daysBetween(date1: Date, date2: Date): number {
     const msPerDay = 1000 * 60 * 60 * 24;
 
@@ -140,6 +149,13 @@ export default function Component() {
               />
             </PopoverContent>
           </Popover>
+          <Button
+            variant={"outline"}
+            className="border border-red-800 bg-gray-900 text-red-500"
+            onClick={set_date_range_to_current_month}
+          >
+            Set to Current Month
+          </Button>
           <div className="mt-5">
             {dates.data?.currentDate && (
               <div>
