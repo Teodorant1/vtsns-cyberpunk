@@ -11,8 +11,8 @@ const LayoutHeader = () => {
   const { data: session } = useSession();
 
   return (
-    <header className="border-b border-red-800 bg-black p-4">
-      <div className="flex items-start justify-between">
+    <header className="glitch border-b border-red-800 bg-black p-4">
+      <div className="glitch flex items-start justify-between">
         <Image
           src="/2e6e40bc-e973-4852-9890-938346d174d4.png"
           width={150}
@@ -26,7 +26,7 @@ const LayoutHeader = () => {
           alt="vtsns-logo"
         /> */}
         {/* <button
-          className="text-white"
+          className="glitch text-white"
           onClick={() => {
             console.log(session);
           }}
@@ -35,49 +35,49 @@ const LayoutHeader = () => {
         </button> */}
         {/* Mobile Menu Toggle */}
         <button
-          className="text-white focus:outline-none md:hidden"
+          className="glitch text-white focus:outline-none md:hidden"
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? <X size={32} /> : <Menu size={32} />}
         </button>
         {/* Desktop Navigation */}
-        <nav className="mx-auto my-auto hidden flex-wrap gap-x-6 gap-y-3 text-2xl text-white md:flex md:items-center md:justify-center">
-          <Link href="/" className="font-bold hover:text-red-400">
+        <nav className="glitch mx-auto my-auto hidden flex-wrap gap-x-6 gap-y-3 text-2xl text-white md:flex md:items-center md:justify-center">
+          <Link href="/" className="glitch font-bold hover:text-red-400">
             Headlines
           </Link>
-          <Link href="/FAQ" className="font-bold hover:text-red-400">
+          <Link href="/FAQ" className="glitch font-bold hover:text-red-400">
             FAQ
           </Link>
           <Link
             href="https://discord.gg/KAnnz5bNRq"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-bold hover:text-red-400"
+            className="glitch font-bold hover:text-red-400"
           >
             Discord
           </Link>
-          <Link href="/intel" className="font-bold hover:text-red-400">
+          <Link href="/intel" className="glitch font-bold hover:text-red-400">
             INTEL
           </Link>
-          <Link href="/submit_intel" className="font-bold hover:text-red-400">
+          <Link href="/submit_intel" className="glitch font-bold hover:text-red-400">
             SUBMIT_INTEL
           </Link>
           <Link
             href="https://multiversal-mishaps.vercel.app/about-creator"
-            className="whitespace-nowrap font-bold hover:text-red-400"
+            className="glitch whitespace-nowrap font-bold hover:text-red-400"
           >
             About creator (different website)
           </Link>
 
-          <div className="flex items-start space-x-6">
+          <div className="glitch flex items-start space-x-6">
             {session?.user ? (
               <>
-                <Link href="/profile" className="font-bold hover:text-red-400">
+                <Link href="/profile" className="glitch font-bold hover:text-red-400">
                   {session.user.username ?? "error can't read username"}
                 </Link>
                 <button
                   onClick={() => void signOut()}
-                  className="w-fit font-bold hover:text-red-400"
+                  className="glitch w-fit font-bold hover:text-red-400"
                 >
                   Sign_Out
                 </button>
@@ -86,11 +86,11 @@ const LayoutHeader = () => {
               <>
                 <Link
                   href="/api/auth/signin"
-                  className="font-bold hover:text-red-400"
+                  className="glitch font-bold hover:text-red-400"
                 >
                   Sign In
                 </Link>
-                <Link href="/register" className="font-bold hover:text-red-400">
+                <Link href="/register" className="glitch font-bold hover:text-red-400">
                   Register
                 </Link>
               </>
@@ -101,17 +101,17 @@ const LayoutHeader = () => {
 
       {/* Mobile Navigation */}
       {isOpen && (
-        <nav className="mt-4 flex flex-col space-y-4 text-center text-2xl text-white md:hidden">
+        <nav className="glitch mt-4 flex flex-col space-y-4 text-center text-2xl text-white md:hidden">
           <Link
             href="/"
-            className="font-bold hover:text-red-400"
+            className="glitch font-bold hover:text-red-400"
             onClick={() => setIsOpen(false)}
           >
             Headlines
           </Link>
           <Link
             href="/FAQ"
-            className="font-bold hover:text-red-400"
+            className="glitch font-bold hover:text-red-400"
             onClick={() => setIsOpen(false)}
           >
             FAQ
@@ -120,7 +120,7 @@ const LayoutHeader = () => {
             href="https://discord.gg/KAnnz5bNRq"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-bold hover:text-red-400"
+            className="glitch font-bold hover:text-red-400"
             onClick={() => setIsOpen(false)}
           >
             Discord
@@ -128,20 +128,20 @@ const LayoutHeader = () => {
           <Link
             onClick={() => setIsOpen(false)}
             href="/intel"
-            className="font-bold hover:text-red-400"
+            className="glitch font-bold hover:text-red-400"
           >
             INTEL
           </Link>
           <Link
             onClick={() => setIsOpen(false)}
             href="/submit_intel"
-            className="font-bold hover:text-red-400"
+            className="glitch font-bold hover:text-red-400"
           >
             SUBMIT_INTEL
           </Link>
           <Link
             href="https://multiversal-mishaps.vercel.app/about-creator"
-            className="font-bold hover:text-red-400"
+            className="glitch font-bold hover:text-red-400"
           >
             About creator (different website)
           </Link>
@@ -149,7 +149,7 @@ const LayoutHeader = () => {
             <>
               <Link
                 href="/profile"
-                className="font-bold hover:text-red-400"
+                className="glitch font-bold hover:text-red-400"
                 onClick={() => setIsOpen(false)}
               >
                 {session.user.username ?? session.user.email}
@@ -159,7 +159,7 @@ const LayoutHeader = () => {
                   void signOut();
                   setIsOpen(false);
                 }}
-                className="font-bold hover:text-red-400"
+                className="glitch font-bold hover:text-red-400"
               >
                 Sign Out
               </button>
@@ -168,14 +168,14 @@ const LayoutHeader = () => {
             <>
               <Link
                 href="/api/auth/signin"
-                className="font-bold hover:text-red-400"
+                className="glitch font-bold hover:text-red-400"
                 onClick={() => setIsOpen(false)}
               >
                 Sign In
               </Link>
               <Link
                 href="/register"
-                className="font-bold hover:text-red-400"
+                className="glitch font-bold hover:text-red-400"
                 onClick={() => setIsOpen(false)}
               >
                 Register

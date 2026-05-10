@@ -144,7 +144,7 @@ export default function RegisterPage() {
             <div className="flex w-full flex-col justify-between px-4 md:flex-row">
               <Button
                 type="button"
-                onClick={() => router.push("/login")}
+                onClick={() => router.push("/api/auth/signin")}
                 className="my-2 whitespace-normal break-words border-red-800 bg-gray-800 py-4 text-center text-red-500 hover:bg-gray-700"
               >
                 RETURN TO LOGIN
