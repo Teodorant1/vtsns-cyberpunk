@@ -7,9 +7,15 @@ import { NextAuthProvider } from "./_components/providers/SessionProvider";
 import { getServerAuthSession } from "~/server/auth";
 
 export const metadata: Metadata = {
-  title: "VTSNS-CYBERPUNK-NEWS",
-  description: "VTSNS-CYBERPUNK-NEWS POWERED BY T3",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  title: "SHANDU-OBAVESHTAJNA-SLUZBHA",
+  description: "SHANDU-OBAVESHTAJNA-SLUZBHA , POWERED BY T3",
+  //icons: [{ rel: "icon", url: "/favicon.ico" }],
+  icons: [
+    {
+      rel: "icon",
+      url: "/9bc588b0-c3f9-4f55-a610-0aed7c271d14.png",
+    },
+  ],
 };
 
 export default async function RootLayout({
