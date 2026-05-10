@@ -149,14 +149,18 @@ export default function Component() {
               />
             </PopoverContent>
           </Popover>
-          <Button
-            variant={"outline"}
-            className="border border-red-800 bg-gray-900 text-red-500"
-            onClick={set_date_range_to_current_month}
-          >
-            Set to Current Month
-          </Button>
+
           <div className="mt-5">
+            <div>
+              <Button
+                variant={"outline"}
+                className="border border-red-800 bg-gray-900 text-red-500"
+                onClick={set_date_range_to_current_month}
+              >
+                Set to Current Month
+              </Button>
+            </div>
+
             {dates.data?.currentDate && (
               <div>
                 IMPORTANT INFO! THE APP DOESN{"'"}T USE YOUR TIMEZONE AND
