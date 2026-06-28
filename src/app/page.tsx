@@ -234,6 +234,12 @@ export default function Component() {
                 <h3 className="glitch mb-2 text-2xl font-semibold text-white">
                   {article.title}
                 </h3>
+                <a
+                  href={article.href}
+                  className="glitch mb-2 text-2xl font-semibold text-white"
+                >
+                  {article.href}
+                </a>
                 <div className="mb-4 flex items-center space-x-4">
                   <div className="flex items-center">
                     <div className="mb-4 flex items-center justify-between text-sm text-red-400">
