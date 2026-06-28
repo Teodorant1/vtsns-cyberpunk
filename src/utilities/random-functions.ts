@@ -214,14 +214,14 @@ export async function shouldRunJob() {
 // }
 export async function scrape_vtsns_CRONJOB() {
   const article_page = await scrape_Predmeti_info();
-  await upsertArticle(article_page);
+  await upsertArticles(article_page);
 
-  await upsertSubject(article_page);
+  await upsertSubjects(article_page);
   //  }
   // }
 }
 
-async function upsertSubject(
+async function upsertSubjects(
   refinedPosts: {
     text: string;
     href: string;
@@ -250,7 +250,7 @@ async function upsertSubject(
   // .returning();
 }
 
-async function upsertArticle(
+async function upsertArticles(
   refinedPosts: {
     text: string;
     href: string;
