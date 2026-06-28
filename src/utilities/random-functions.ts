@@ -85,13 +85,16 @@ export async function scrape_Predmeti_info() {
       has_been_announced_in_discord: false,
     };
     // Adjust the createdAt time to preserve scraping order within the same day
-    if (article.createdAt instanceof Date && !isNaN(article.createdAt.getTime())) {
+    if (
+      article.createdAt instanceof Date &&
+      !isNaN(article.createdAt.getTime())
+    ) {
       const totalSeconds = 86399 - i; // 23:59:59 is 86399 seconds in a day
       article.createdAt.setHours(
         Math.floor(totalSeconds / 3600),
         Math.floor((totalSeconds % 3600) / 60),
         totalSeconds % 60,
-        0
+        0,
       );
     }
     refinedPosts.push(article);
@@ -116,9 +119,12 @@ export async function scrape_vtsns_article(url: string) {
 
   const combinedText = paragraphText.join(" ");
 
+  const mini_hrefLinks = [url];
+  const new_hrefLinks = [...mini_hrefLinks, ...hrefLinks];
+
   const returnvalue = {
     combinedText: combinedText,
-    hrefLinks: hrefLinks,
+    hrefLinks: new_hrefLinks,
   };
 
   return returnvalue;
@@ -260,8 +266,7 @@ async function upsertArticle(
 ) {
   await db
     .insert(article)
-    .values(refinedPosts
-    )
+    .values(refinedPosts)
     //  .onConflictDoNothing();
     .onConflictDoUpdate({
       target: [article.href_title_date],
