@@ -16,7 +16,7 @@ import HrefLinks from "./_components/href_list";
 import CommentList from "./_components/article/commentList";
 export default function Component() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: new Date(Date.UTC(2024, 8, 1)),
+    from: new Date(Date.UTC(2024, 8, 2)),
     to: addDays(new Date(), 3),
   });
   const [isLoading, setIsLoading] = useState(false);
